@@ -1,0 +1,8 @@
+{
+  "name": "VueIonicPlayground",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue",
+  "id": "03828db0"
+}
