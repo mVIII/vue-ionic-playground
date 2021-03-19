@@ -1,34 +1,42 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
-import Tabs from '../views/Tabs.vue'
+import { home, book, cart } from 'ionicons/icons';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    redirect: '/tabs/tab1',
-    name: 'Main',
+    path: '/home',
+    name: 'home',
+    component: () => import('@/views/Tab1.vue'),
+    meta: { displayName: 'Home', icon: home },
   },
   {
-        path: '/tabs/tab1',
-        name: 'tab1',
-        component: () => import('@/views/Tab1.vue')
-      },
-      {
-        path: '/tabs/tab2',
-        name: 'tab2',
-        component: () => import('@/views/Tab2.vue')
-      },
-      {
-        path: '/tabs/tab3',
-        name: 'tab3',
-        component: () => import('@/views/Tab3.vue')
-      }
-]
+    path: '/catalogue',
+    name: 'catalogue',
+    component: () => import('@/views/Tab2.vue'),
+    meta: { displayName: 'Catalogue', icon: book },
+  },
+  {
+    path: '/suppliers',
+    name: 'supliers',
+    component: () => import('@/views/Tab3.vue'),
+    meta: { displayName: 'Suppliers', icon: cart },
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
-})
+  routes: [
+    {
+      path: '',
+      component: () => import('@/layouts/basic.vue'),
+      children: [...routes],
+    },
+  ],
+});
 
-export default router
-export { routes };
+function goTo(name: string) {
+  router.push({ name: name });
+}
+
+export default router;
+export { routes, goTo };
