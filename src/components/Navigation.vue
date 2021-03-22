@@ -1,13 +1,20 @@
 <template>
-  <ion-header>
+  <!---HEADER--->
+  <ion-header class="ion-hide-md-up">
     <ion-toolbar>
-      <ion-title>{{router.currentRoute.value.name?.toString()}}</ion-title>
+      <ion-title>{{ router.currentRoute.value.name?.toString() }}</ion-title>
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <ion-menu side="start" menu-id="first" content-id="main">
+  <!---MENU--->
+  <ion-menu
+    side="start"
+    menu-id="first"
+    content-id="main"
+    class="ion-hide-md-up"
+  >
     <ion-header>
       <ion-toolbar color="primary">
         <ion-title>Start Menu</ion-title>

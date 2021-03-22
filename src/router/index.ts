@@ -6,7 +6,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/home',
     name: 'home',
-    component: () => import('@/views/Tab1.vue'),
+    component: () => import('@/views/Home.vue'),
     meta: { displayName: 'Home', icon: home },
   },
   {
@@ -29,14 +29,23 @@ const router = createRouter({
     {
       path: '',
       component: () => import('@/layouts/basic.vue'),
+      redirect: '/home',
       children: [...routes],
+    },
+    {
+      path:'/test',
+      component: () => import('@/views/Home.vue'),
     },
   ],
 });
+
+function currentRoute() {
+  return router.currentRoute.value.name?.toString();
+}
 
 function goTo(name: string) {
   router.push({ name: name });
 }
 
 export default router;
-export { routes, goTo };
+export { routes, goTo, currentRoute };
