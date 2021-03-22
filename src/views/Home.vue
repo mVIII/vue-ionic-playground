@@ -112,10 +112,9 @@ export default {
 </script>
 <style scoped>
 .container {
-  /* display: flex;
+  display: flex;
   margin-top: 50px;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  */
 }
 </style>
