@@ -1,4 +1,4 @@
-import { AuthenticationService } from '../Athentication';
+import { AuthenticationService } from '../Authentication';
 import { LoginResult, NewUser, Errors } from '../dtos';
 import { User, UserRole } from '@/types';
 import JWTEncode from 'jwt-encode';
