@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 import 'reflect-metadata';
 import App from './App.vue';
 import router from './router';
-
+import 'reflect-metadata';
 import { IonicVue } from '@ionic/vue';
 
 /* Core CSS required for Ionic components to work properly */
