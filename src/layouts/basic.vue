@@ -28,6 +28,10 @@
             <ion-icon :icon="route.meta.icon" slot="start" />
             <ion-label>{{ route.meta.displayName }}</ion-label>
           </ion-item>
+          <ion-item @click="logout()">
+            <ion-icon :icon="logOut" slot="start" />
+            <ion-label>Logout</ion-label>
+          </ion-item>
         </ion-list>
       </ion-content>
     </ion-menu>
@@ -39,6 +43,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import router, { routes, goTo, currentRoute } from '@/router';
+import { logOut } from 'ionicons/icons';
+import { useAuth } from '@/composables/useAuth';
 import {
   IonSplitPane,
   IonIcon,
@@ -82,13 +88,17 @@ export default defineComponent({
       menuController.open('first');
     },
     goto(location: string) {
-      console.log(location)
+      console.log(location);
       goTo(location);
       menuController.close('first');
     },
   },
   setup() {
+    const { logout } = useAuth();
+
     return {
+      logOut,
+      logout,
       router,
       routes,
       currentRoute,

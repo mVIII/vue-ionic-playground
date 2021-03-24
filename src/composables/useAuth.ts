@@ -19,11 +19,20 @@ export function useAuth() {
     if (error) {
       throw error;
     }
-    //window.location.reload();
+    window.location.reload();
+  }
+
+  async function logout(): Promise<void> {
+    const error = await authStore.Logout();
+    if (error) {
+      throw error;
+    }
+    window.location.reload();
   }
 
   return {
     login,
+    logout,
     credentials,
   };
 }

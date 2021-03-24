@@ -1,7 +1,13 @@
 import { injectable, inject } from 'tsyringe';
 import { AuthenticationService } from '@/services/Authentication';
 import { Errors } from '@/services/dtos';
-import { TOKEN_COOKIE, isAuthenticated, setToken, unsetToken } from './auth';
+import {
+  TOKEN_COOKIE,
+  isAuthenticated,
+  setToken,
+  unsetToken,
+  token,
+} from './auth';
 import Cookie from 'js-cookie';
 
 @injectable()
@@ -41,8 +47,14 @@ export default class AuthStore {
     setToken(result.token);
   }
 
-  public async Logout(token: string): Promise<void | Errors> {
-    const result = await this.authService.logout(token);
+  public async Logout(): Promise<void | Errors> {
+    const cookie = Cookie.get(TOKEN_COOKIE);
+
+    if (!cookie) {
+      return;
+    }
+
+    const result = await this.authService.logout(cookie);
     if (result === Errors.Unexpected) {
       return Errors.Unexpected;
     }
