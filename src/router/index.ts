@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import { home, book, cart } from 'ionicons/icons';
+import { authenticatedGuard } from './guards';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -27,17 +28,20 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes: [
     {
+      name: 'login',
+      path: '/login',
+      component: () => import('@/views/Login.vue'),
+    },
+    {
       path: '',
       component: () => import('@/layouts/basic.vue'),
       redirect: '/home',
       children: [...routes],
     },
-    {
-      path:'/test',
-      component: () => import('@/views/Home.vue'),
-    },
   ],
 });
+
+router.beforeEach(authenticatedGuard);
 
 function currentRoute() {
   return router.currentRoute.value.name?.toString();
