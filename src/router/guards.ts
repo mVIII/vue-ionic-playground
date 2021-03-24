@@ -11,6 +11,8 @@ export const authenticatedGuard = (
 ) => {
   const authStore = container.resolve(AuthStore);
 
+  authStore.setStateIfCookieExists();
+
   if (to.name !== 'login') {
     if (!authStore.IsAthenticated()) {
       return next({ name: 'login' });

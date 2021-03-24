@@ -4,7 +4,6 @@ import { Errors } from '@/services/dtos';
 import { TOKEN_COOKIE, isAuthenticated, setToken, unsetToken } from './auth';
 import Cookie from 'js-cookie';
 
-
 @injectable()
 export default class AuthStore {
   private authService: AuthenticationService;
@@ -12,7 +11,14 @@ export default class AuthStore {
     this.authService = authService;
   }
 
-  public cookieIsSet(): boolean {
+  public setStateIfCookieExists() {
+    const cookie = Cookie.get(TOKEN_COOKIE);
+    if (cookie) {
+      setToken(cookie);
+    }
+  }
+
+  cookieIsSet(): boolean {
     return Cookie.get(TOKEN_COOKIE) ? true : false;
   }
 
