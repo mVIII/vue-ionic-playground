@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "2.4.7",
+    "@harlem/plugin-devtools": "^1.2.2",
     "@types/jest": "^24.0.19",
     "@types/js-cookie": "^2.2.6",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
