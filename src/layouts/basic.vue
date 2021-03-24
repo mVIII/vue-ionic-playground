@@ -1,14 +1,6 @@
 <template>
   <!--- MOBILE HEADER--->
   <ion-split-pane when="md" content-id="main">
-    <ion-header class="ion-hide-md-up">
-      <ion-toolbar>
-        <ion-title>{{ currentRoute() }}</ion-title>
-        <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
     <!---MENU--->
     <ion-menu side="start" menu-id="first" class="ion-menu" content-id="main">
       <ion-header>
@@ -22,18 +14,20 @@
             class="ion-menu-item"
             v-for="route in routes"
             :key="route.name"
-            :class="{ active: currentRoute() === route.name }"
+            :class="{ active: currentRoute().name === route.name }"
             @click="goto(route.name)"
           >
             <ion-icon :icon="route.meta.icon" slot="start" />
             <ion-label>{{ route.meta.displayName }}</ion-label>
           </ion-item>
-          <ion-item @click="logout()">
-            <ion-icon :icon="logOut" slot="start" />
-            <ion-label>Logout</ion-label>
-          </ion-item>
         </ion-list>
       </ion-content>
+      <ion-footer class="bar-stable">
+        <ion-item @click="logout()">
+          <ion-icon :icon="logOut" slot="start" />
+          <ion-label>Logout</ion-label>
+        </ion-item>
+      </ion-footer>
     </ion-menu>
 
     <ion-router-outlet id="main" />
@@ -42,15 +36,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import router, { routes, goTo, currentRoute } from '@/router';
+import { routes, goTo, currentRoute } from '@/router';
 import { logOut } from 'ionicons/icons';
 import { useAuth } from '@/composables/useAuth';
 import {
   IonSplitPane,
   IonIcon,
   IonLabel,
-  IonButtons,
-  IonMenuButton,
   IonContent,
   IonHeader,
   IonItem,
@@ -60,6 +52,7 @@ import {
   IonToolbar,
   IonRouterOutlet,
   menuController,
+  IonFooter,
 } from '@ionic/vue';
 
 export default defineComponent({
@@ -69,8 +62,6 @@ export default defineComponent({
     IonSplitPane,
     IonLabel,
     IonIcon,
-    IonButtons,
-    IonMenuButton,
     IonContent,
     IonHeader,
     IonItem,
@@ -78,10 +69,11 @@ export default defineComponent({
     IonMenu,
     IonTitle,
     IonToolbar,
+    IonFooter,
   },
   methods: {
     isCurrentRoute(routeName: string) {
-      return routeName == currentRoute();
+      return routeName == currentRoute().name;
     },
     openFirst() {
       menuController.enable(true, 'first');
@@ -99,7 +91,6 @@ export default defineComponent({
     return {
       logOut,
       logout,
-      router,
       routes,
       currentRoute,
     };

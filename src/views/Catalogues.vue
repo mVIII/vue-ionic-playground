@@ -1,14 +1,24 @@
 <template>
   <ion-page>
+    <ion-header class="ion-hide-md-up">
+      <ion-toolbar>
+        <ion-title>Catalogues</ion-title>
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
     <ion-content :fullscreen="true">
-      <ion-list>
-        <ion-item v-for="catalogue in catalogues" :key="catalogue.name">
-          <ion-label>{{ catalogue.name }}</ion-label>
-          <ion-badge color="secondary" slot="end">{{
-            catalogue.items.length
-          }}</ion-badge>
-        </ion-item>
-      </ion-list>
+      <div v-for="index in 10" :key="index">
+        <ion-list>
+          <ion-item v-for="catalogue in catalogues" :key="catalogue.name">
+            <ion-label>{{ catalogue.name }}</ion-label>
+            <ion-badge color="secondary" slot="end">{{
+              catalogue.items.length
+            }}</ion-badge>
+          </ion-item>
+        </ion-list>
+      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -40,12 +50,14 @@ export default {
     };
 
     type Catalogue = {
+      id: number;
       name: string;
       items: Item[];
     };
 
     const catalogues: Catalogue[] = [
       {
+        id: 0,
         name: 'Wines',
         items: [
           {
@@ -66,6 +78,7 @@ export default {
         ],
       },
       {
+        id: 1,
         name: 'Fish',
         items: [
           {
@@ -95,6 +108,7 @@ export default {
         ],
       },
       {
+        id: 2,
         name: 'Vegetables',
         items: [
           {
@@ -121,6 +135,7 @@ export default {
         ],
       },
       {
+        id: 3,
         name: 'Meat',
         items: [
           {
@@ -144,6 +159,7 @@ export default {
         ],
       },
       {
+        id: 4,
         name: 'Legumes',
         items: [
           {

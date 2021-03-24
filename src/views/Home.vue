@@ -1,5 +1,13 @@
 <template>
   <ion-page>
+    <ion-header class="ion-hide-md-up">
+      <ion-toolbar>
+        <ion-title>Home</ion-title>
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
     <ion-content>
       <div class="container">
         <div v-for="item in items" :key="item.name">
