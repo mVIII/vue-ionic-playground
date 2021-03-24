@@ -1,5 +1,5 @@
 import { JWT } from '@/types';
-console.log("fucked")
+
 interface State {
   token: JWT | null;
 }
