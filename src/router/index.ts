@@ -12,9 +12,9 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/catalogue',
-    name: 'catalogue',
-    component: () => import('@/views/Tab2.vue'),
-    meta: { displayName: 'Catalogue', icon: book },
+    name: 'catalogues',
+    component: () => import('@/views/Catalogues.vue'),
+    meta: { displayName: 'Catalogues', icon: book },
   },
   {
     path: '/suppliers',
@@ -44,7 +44,7 @@ const router = createRouter({
 router.beforeEach(authenticatedGuard);
 
 function currentRoute() {
-  return router.currentRoute.value.name?.toString();
+  return router.currentRoute.value
 }
 
 function goTo(name: string) {
