@@ -1,6 +1,6 @@
 import { AuthenticationService } from '../Authentication';
 import { LoginResult, NewUser, Errors } from '../dtos';
-import { User, UserRole } from '@/types';
+import { UserRole } from '@/types';
 import JWTEncode from 'jwt-encode';
 
 const secret = '122345';
