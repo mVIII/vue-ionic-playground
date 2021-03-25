@@ -1,11 +1,11 @@
-import { Catalogue } from '@/types';
+import { Catalogue, Item } from '@/types';
 import { CatalogueService } from '../Catalogue';
 import { Errors } from '../dtos';
 
 const catalogues: Catalogue[] = [
   {
     id: '0',
-    name: 'Wines',
+    name: 'Wines 🥤',
     items: [
       {
         id: '0',
@@ -162,5 +162,20 @@ const catalogues: Catalogue[] = [
 export default class MockCatalogueService implements CatalogueService {
   async GetCatalogues(): Promise<Catalogue[] | Errors.Unexpected> {
     return catalogues;
+  }
+  async GetCatalogueItems(
+    id: string
+  ): Promise<Item[] | Errors.Unexpected | Errors.CatalogueNotFound> {
+    const items: Item[] = [];
+    catalogues.forEach((catalogue) => {
+      if (catalogue.id === id) {
+        items.push(...catalogue.items);
+      }
+    });
+
+    if (items.length === 0) {
+      return Errors.CatalogueNotFound;
+    }
+    return items;
   }
 }
