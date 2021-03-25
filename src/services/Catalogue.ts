@@ -1,9 +1,9 @@
-import { Catalogue, Item } from '@/types';
+import { Catalogue } from '@/types';
 import { Errors } from './dtos';
 
 export interface CatalogueService {
   GetCatalogues(): Promise<Catalogue[] | Errors.Unexpected>;
-  GetCatalogueItems(
+  GetCatalogue(
     id: string
-  ): Promise<Item[] | Errors.Unexpected | Errors.CatalogueNotFound>;
+  ): Promise<Catalogue | Errors.Unexpected | Errors.CatalogueNotFound>;
 }

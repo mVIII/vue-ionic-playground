@@ -163,19 +163,19 @@ export default class MockCatalogueService implements CatalogueService {
   async GetCatalogues(): Promise<Catalogue[] | Errors.Unexpected> {
     return catalogues;
   }
-  async GetCatalogueItems(
+  async GetCatalogue(
     id: string
-  ): Promise<Item[] | Errors.Unexpected | Errors.CatalogueNotFound> {
-    const items: Item[] = [];
+  ): Promise<Catalogue | Errors.Unexpected | Errors.CatalogueNotFound> {
+    let selectedCatalogue: Catalogue | null = null;
     catalogues.forEach((catalogue) => {
       if (catalogue.id === id) {
-        items.push(...catalogue.items);
+        selectedCatalogue = catalogue;
       }
     });
 
-    if (items.length === 0) {
+    if (!selectedCatalogue) {
       return Errors.CatalogueNotFound;
     }
-    return items;
+    return selectedCatalogue;
   }
 }
