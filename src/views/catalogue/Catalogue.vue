@@ -4,13 +4,19 @@
       <ion-toolbar>
         <ion-title>Items</ion-title>
         <ion-buttons slot="start">
-          <ion-back-button href="catalogues">></ion-back-button>
+          <ion-back-button default-href="/catalogues"></ion-back-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
+      <ion-toolbar>
+        <ion-searchbar @ionInput="filterDisplayedItems($event.target.value)"></ion-searchbar>
+      </ion-toolbar>
       <ion-list>
-        <ion-item v-for="item in items" :key="item.name">
+        <ion-list-header>
+          {{ selectedCatalogue.name }}
+        </ion-list-header>
+        <ion-item v-for="item in displayedItems" :key="item.name">
           <ion-label>{{ item.name }}</ion-label>
         </ion-item>
       </ion-list>
@@ -22,25 +28,28 @@
 import {
   IonPage,
   IonList,
+  IonSearchbar,
   IonContent,
   IonLabel,
   IonItem,
   IonHeader,
   IonToolbar,
-  
   IonButtons,
   IonTitle,
+  IonListHeader,
   IonBackButton,
 } from '@ionic/vue';
 
 import { useCatalogue } from '@/composables/useCatalogue';
 import { onMounted } from '@vue/runtime-core';
 import router from '@/router';
+
 export default {
   name: 'Catalogue',
   components: {
     IonButtons,
     IonTitle,
+    IonSearchbar,
     IonLabel,
     IonHeader,
     IonToolbar,
@@ -48,23 +57,27 @@ export default {
     IonList,
     IonContent,
     IonPage,
-   
+    IonListHeader,
     IonBackButton,
   },
   setup() {
-    const { getCatalogueItems, items } = useCatalogue();
+    const {
+      selectedCatalogue,
+      getCatalogue,
+      displayedItems,
+      filterDisplayedItems,
+    } = useCatalogue();
 
     onMounted(async () => {
       try {
         const routeID = router.currentRoute.value.params.id as string;
-
-        await getCatalogueItems(routeID);
+        await getCatalogue(routeID);
       } catch (error) {
         console.log(error);
       }
     });
 
-    return { items };
+    return { selectedCatalogue, filterDisplayedItems, displayedItems };
   },
 };
 </script>
