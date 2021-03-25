@@ -27,10 +27,15 @@ import '@ionic/vue/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import MockAuthenticationService from './services/mock/Authentication';
+import MockAuthenticationService from '@/services/mock/Authentication';
+import MockCatalogueService from '@/services/mock/Catalogue';
 
 container.register('Authentication', {
   useClass: MockAuthenticationService,
+});
+
+container.register('Catalogue', {
+  useClass: MockCatalogueService,
 });
 
 const plugins = [];
