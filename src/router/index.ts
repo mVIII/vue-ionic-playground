@@ -7,18 +7,30 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/home',
     name: 'home',
-    component: () => import('@/views/Home.vue'),
+    component: () => import( /* webpackChunkName: "home" */  '@/views/Home.vue'),
     meta: { displayName: 'Home', icon: home },
   },
   {
-    path: '/catalogue',
-    name: 'catalogues',
-    component: () => import('@/views/Catalogues.vue'),
+    path: '/catalogues',
+    name: 'cataloguesRoot',
+    component: () => import( '@/views/catalogue/index.vue'),
     meta: { displayName: 'Catalogues', icon: book },
+    children: [
+      {
+        path: '',
+        name: 'catalogues',
+        component: () => import( /* webpackChunkName: "catalogues" */'@/views/catalogue/Catalogues.vue'),
+      },
+      {
+        path: ':id',
+        name: 'catalogue',
+        component: () => import( /* webpackChunkName: "catalogue" */'@/views/catalogue/Catalogue.vue'),
+      },
+    ],
   },
   {
     path: '/suppliers',
-    name: 'supliers',
+    name: 'suppliers',
     component: () => import('@/views/Tab3.vue'),
     meta: { displayName: 'Suppliers', icon: cart },
   },
@@ -30,11 +42,11 @@ const router = createRouter({
     {
       name: 'login',
       path: '/login',
-      component: () => import('@/views/Login.vue'),
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue'),
     },
     {
       path: '',
-      component: () => import('@/layouts/basic.vue'),
+      component: () => import(/* webpackChunkName: "basic-layout" */'@/layouts/basic.vue'),
       redirect: '/home',
       children: [...routes],
     },
@@ -44,7 +56,7 @@ const router = createRouter({
 router.beforeEach(authenticatedGuard);
 
 function currentRoute() {
-  return router.currentRoute.value
+  return router.currentRoute.value;
 }
 
 function goTo(name: string) {
