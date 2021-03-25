@@ -24,16 +24,26 @@
 </template>
 
 <script lang="ts">
-import { IonPage, IonContent } from '@ionic/vue';
+import {
+  IonPage,
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonMenuButton,
+  IonButtons,
+} from '@ionic/vue';
 import { ApexOptions } from 'apexcharts';
 import VueApexCharts from 'vue3-apexcharts';
 
 export default {
   name: 'Home',
   components: {
-    //IonHeader,
-    //IonToolbar,
-    //IonTitle,
+    IonMenuButton,
+    IonButtons,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
     IonContent,
     IonPage,
     apexchart: VueApexCharts,
