@@ -1,5 +1,4 @@
 <template>
-  <!--- MOBILE HEADER--->
   <ion-split-pane when="md" content-id="main">
     <!---MENU--->
     <ion-menu side="start" menu-id="first" class="ion-menu" content-id="main">
@@ -29,7 +28,7 @@
         </ion-item>
       </ion-footer>
     </ion-menu>
-
+    <!---OUTLET--->
     <ion-router-outlet id="main" />
   </ion-split-pane>
 </template>
