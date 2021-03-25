@@ -1,38 +1,33 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
-import { home, book, cart } from 'ionicons/icons';
 import { authenticatedGuard } from './guards';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/home',
     name: 'home',
-    component: () => import( /* webpackChunkName: "home" */  '@/views/Home.vue'),
-    meta: { displayName: 'Home', icon: home },
+    component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
   },
   {
     path: '/catalogues',
-    name: 'cataloguesRoot',
-    component: () => import( '@/views/catalogue/index.vue'),
-    meta: { displayName: 'Catalogues', icon: book },
-    children: [
-      {
-        path: '',
-        name: 'catalogues',
-        component: () => import( /* webpackChunkName: "catalogues" */'@/views/catalogue/Catalogues.vue'),
-      },
-      {
-        path: ':id',
-        name: 'catalogue',
-        component: () => import( /* webpackChunkName: "catalogue" */'@/views/catalogue/Catalogue.vue'),
-      },
-    ],
+    name: 'catalogues',
+    component: () =>
+      import(
+        /* webpackChunkName: "catalogues" */ '@/views/catalogue/Catalogues.vue'
+      ),
+  },
+  {
+    path: '/catalogues/:id',
+    name: 'catalogue',
+    component: () =>
+      import(
+        /* webpackChunkName: "catalogue" */ '@/views/catalogue/Catalogue.vue'
+      ),
   },
   {
     path: '/suppliers',
     name: 'suppliers',
     component: () => import('@/views/Tab3.vue'),
-    meta: { displayName: 'Suppliers', icon: cart },
   },
 ];
 
@@ -42,11 +37,13 @@ const router = createRouter({
     {
       name: 'login',
       path: '/login',
-      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue'),
+      component: () =>
+        import(/* webpackChunkName: "login" */ '@/views/Login.vue'),
     },
     {
       path: '',
-      component: () => import(/* webpackChunkName: "basic-layout" */'@/layouts/basic.vue'),
+      component: () =>
+        import(/* webpackChunkName: "basic-layout" */ '@/layouts/basic.vue'),
       redirect: '/home',
       children: [...routes],
     },

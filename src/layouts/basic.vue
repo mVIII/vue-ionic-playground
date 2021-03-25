@@ -10,14 +10,25 @@
       <ion-content>
         <ion-list>
           <ion-item
-            class="ion-menu-item"
-            v-for="route in routes"
-            :key="route.name"
-            :class="{ active: currentRoute().name === route.name }"
-            @click="goto(route.name)"
+            @click="goto('home')"
+            :class="{ active: currentRoute().name === 'home' }"
           >
-            <ion-icon :icon="route.meta.icon" slot="start" />
-            <ion-label>{{ route.meta.displayName }}</ion-label>
+            <ion-icon :icon="home" slot="start" />
+            <ion-label>Home</ion-label>
+          </ion-item>
+          <ion-item
+            @click="goto('catalogues')"
+            :class="{ active: currentRoute().name === 'catalogues' }"
+          >
+            <ion-icon :icon="book" slot="start" />
+            <ion-label>Catalogue</ion-label>
+          </ion-item>
+          <ion-item
+            @click="goto('suppliers')"
+            :class="{ active: currentRoute().name === 'suppliers' }"
+          >
+            <ion-icon :icon="cart" slot="start" />
+            <ion-label>Suppliers</ion-label>
           </ion-item>
         </ion-list>
       </ion-content>
@@ -35,8 +46,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { routes, goTo, currentRoute } from '@/router';
-import { logOut } from 'ionicons/icons';
+import router, { currentRoute,goTo } from '@/router';
+import { logOut, home, book, cart } from 'ionicons/icons';
 import { useAuth } from '@/composables/useAuth';
 import {
   IonSplitPane,
@@ -79,7 +90,6 @@ export default defineComponent({
       menuController.open('first');
     },
     goto(location: string) {
-      console.log(location);
       goTo(location);
       menuController.close('first');
     },
@@ -89,8 +99,12 @@ export default defineComponent({
 
     return {
       logOut,
+      home,
+      book,
+
+      cart,
       logout,
-      routes,
+      router,
       currentRoute,
     };
   },
