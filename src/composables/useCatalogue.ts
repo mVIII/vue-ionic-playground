@@ -11,10 +11,31 @@ export function useCatalogue() {
     name: '',
     items: [],
   });
+
+  //CREATE/UPDATE/DELETE catalogue
+  const CRDCatalogue = ref<Catalogue>({
+    id: '',
+    name: '',
+    items: [],
+  });
+
   const catalogues = ref<Catalogue[]>([]);
   const displayedItems = ref<Item[]>([]);
 
   const catalogueService = container.resolve<CatalogueService>('Catalogue');
+
+  async function createCatalogue(): Promise<void> {
+    const result = await catalogueService.CreateCatalogue(CRDCatalogue.value);
+    if (result === Errors.Unexpected) {
+      throw result;
+    }
+    //EMPTY
+    CRDCatalogue.value = {
+      id: '',
+      name: '',
+      items: [],
+    };
+  }
 
   async function getCatalogues(): Promise<void> {
     const result = await catalogueService.GetCatalogues();
@@ -56,6 +77,11 @@ export function useCatalogue() {
     run: runWrappedGetCatalogues,
   } = createAsyncProcess(getCatalogues);
 
+  const {
+    active: catalogueUploading,
+    run: runWrappedCreateCatalogue,
+  } = createAsyncProcess(createCatalogue);
+
   watch(selectedCatalogue, () => {
     displayedItems.value = selectedCatalogue.value.items;
   });
@@ -70,5 +96,8 @@ export function useCatalogue() {
     runWrappedGetCatalogues,
     getCatalogues,
     getCatalogue,
+    catalogueUploading,
+    runWrappedCreateCatalogue,
+    CRDCatalogue,
   };
 }
