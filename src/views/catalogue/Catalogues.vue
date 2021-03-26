@@ -83,7 +83,7 @@ import { onMounted } from '@vue/runtime-core';
 import router from '@/router';
 import { ellipsisVertical, ellipsisHorizontal } from 'ionicons/icons';
 import { ref } from 'vue';
-import CatalogueNew from './New.vue';
+import CatalogueNew from './NewEdit.vue';
 import { Catalogue } from '@/types';
 
 export default {
