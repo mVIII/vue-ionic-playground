@@ -1,6 +1,7 @@
 import { CatalogueService } from '@/services/Catalogue';
 import { Errors } from '@/services/dtos';
 import { Catalogue, Item } from '@/types';
+import createAsyncProcess from '@/utils/create-async-process';
 import { container } from 'tsyringe';
 import { ref, watch } from 'vue';
 
@@ -15,7 +16,7 @@ export function useCatalogue() {
 
   const catalogueService = container.resolve<CatalogueService>('Catalogue');
 
-  async function getCatalogues() {
+  async function getCatalogues(): Promise<void> {
     const result = await catalogueService.GetCatalogues();
 
     if (result === Errors.Unexpected) {
@@ -24,7 +25,7 @@ export function useCatalogue() {
     catalogues.value = result;
   }
 
-  async function getCatalogue(id: string) {
+  async function getCatalogue(id: string): Promise<void> {
     const result = await catalogueService.GetCatalogue(id);
     if (result === Errors.Unexpected) {
       throw result;
@@ -34,16 +35,26 @@ export function useCatalogue() {
     selectedCatalogue.value = result;
   }
 
+  async function refreshCatalogues(event: any) {
+    await getCatalogues();
+    event.target.complete();
+  }
+
   function filterDisplayedItems(query: string) {
-    console.log(query)
     const itemsToDisplay = selectedCatalogue.value.items
       .map((item) =>
-        item.name.toLowerCase().indexOf(query.toLocaleLowerCase()) > -1 ? item : null
+        item.name.toLowerCase().indexOf(query.toLocaleLowerCase()) > -1
+          ? item
+          : null
       )
       .filter((v) => v) as Item[];
-      console.log(itemsToDisplay)
     displayedItems.value = itemsToDisplay;
   }
+
+  const {
+    active: cataloguesLoading,
+    run: runWrappedGetCatalogues,
+  } = createAsyncProcess(getCatalogues);
 
   watch(selectedCatalogue, () => {
     displayedItems.value = selectedCatalogue.value.items;
@@ -54,6 +65,9 @@ export function useCatalogue() {
     filterDisplayedItems,
     selectedCatalogue,
     catalogues,
+    cataloguesLoading,
+    refreshCatalogues,
+    runWrappedGetCatalogues,
     getCatalogues,
     getCatalogue,
   };
