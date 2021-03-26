@@ -1,13 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 import { AuthenticationService } from '@/services/Authentication';
 import { Errors } from '@/services/dtos';
-import {
-  TOKEN_COOKIE,
-  isAuthenticated,
-  setToken,
-  unsetToken,
-  token,
-} from './auth';
+import { TOKEN_COOKIE, isAuthenticated, setToken, unsetToken } from './auth';
 import Cookie from 'js-cookie';
 
 @injectable()
