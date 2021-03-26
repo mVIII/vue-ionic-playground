@@ -160,6 +160,19 @@ const catalogues: Catalogue[] = [
 ];
 
 export default class MockCatalogueService implements CatalogueService {
+  async CreateCatalogue(
+    catalogue: Catalogue
+  ): Promise<Catalogue | Errors.Unexpected> {
+    catalogue.id = String(catalogues.length + 1);
+    catalogues.push(catalogue);
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 300);
+    });
+
+    return catalogue;
+  }
+
   async GetCatalogues(): Promise<Catalogue[] | Errors.Unexpected> {
     await new Promise((resolve) => {
       setTimeout(resolve, 1000);
