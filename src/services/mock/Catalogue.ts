@@ -1,4 +1,4 @@
-import { Catalogue, Item } from '@/types';
+import { Catalogue } from '@/types';
 import { CatalogueService } from '../Catalogue';
 import { Errors } from '../dtos';
 
@@ -161,6 +161,9 @@ const catalogues: Catalogue[] = [
 
 export default class MockCatalogueService implements CatalogueService {
   async GetCatalogues(): Promise<Catalogue[] | Errors.Unexpected> {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
     return catalogues;
   }
   async GetCatalogue(
