@@ -7,13 +7,7 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
         <ion-buttons slot="end">
-          <ion-button @click="setOptionsOpen(true)">
-            <ion-icon
-              :icon="ellipsisVertical"
-              :ios="ellipsisHorizontal"
-              :md="ellipsisVertical"
-            />
-          </ion-button>
+          <ion-button @click="clickedAdd()">Add</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -22,30 +16,44 @@
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
       <ion-list>
-        <ion-item
-          v-for="catalogue in catalogues"
-          :key="catalogue.name"
-          @click="goToCatalogue(catalogue.id)"
-        >
-          <ion-label>{{ catalogue.name }}</ion-label>
+        <ion-item v-for="catalogue in catalogues" :key="catalogue.name">
+          <ion-label @click="goToCatalogue(catalogue.id)">{{
+            catalogue.name
+          }}</ion-label>
           <ion-badge color="secondary" slot="end">{{
             catalogue.items.length
           }}</ion-badge>
+          <ion-buttons slot="end">
+            <ion-button @click="clickedOptions(catalogue)">
+              <ion-icon
+                :icon="ellipsisVertical"
+                :ios="ellipsisHorizontal"
+                :md="ellipsisVertical"
+              />
+            </ion-button>
+          </ion-buttons>
         </ion-item>
       </ion-list>
     </ion-content>
     <ion-loading
-      :is-open="cataloguesLoading"
+      :is-open="cataloguesLoading || catalogueUploading"
       message="Please wait..."
       :duration="1000"
     >
     </ion-loading>
     <ion-action-sheet
       :is-open="optionsOpen"
-      header="Catalogues"
+      :header="CRDCatalogue.name"
       :buttons="optionButtons"
     >
     </ion-action-sheet>
+    <ion-modal :is-open="addModalOpen">
+      <CatalogueNew
+        @dismiss="setModalOpen(false)"
+        @save="saveCatalogue"
+        :catalogue="CRDCatalogue"
+      ></CatalogueNew>
+    </ion-modal>
   </ion-page>
 </template>
 
@@ -68,12 +76,16 @@ import {
   IonRefresherContent,
   IonButton,
   IonActionSheet,
+  IonModal,
 } from '@ionic/vue';
 import { useCatalogue } from '@/composables/useCatalogue';
 import { onMounted } from '@vue/runtime-core';
 import router from '@/router';
-import { book, ellipsisVertical, ellipsisHorizontal } from 'ionicons/icons';
+import { ellipsisVertical, ellipsisHorizontal } from 'ionicons/icons';
 import { ref } from 'vue';
+import CatalogueNew from './New.vue';
+import { Catalogue } from '@/types';
+
 export default {
   name: 'Catalogues',
   components: {
@@ -94,6 +106,8 @@ export default {
     IonIcon,
     IonRefresherContent,
     IonActionSheet,
+    CatalogueNew,
+    IonModal,
   },
   methods: {
     goToCatalogue(id: string) {
@@ -102,14 +116,40 @@ export default {
   },
   setup() {
     const {
-      refreshCatalogues,
       catalogues,
       cataloguesLoading,
+      catalogueUploading,
       runWrappedGetCatalogues,
+      CRDCatalogue,
+      runWrappedCreateCatalogue,
     } = useCatalogue();
+
+    const addModalOpen = ref(false);
+    const setModalOpen = (state: boolean) => (addModalOpen.value = state);
 
     const optionsOpen = ref(false);
     const setOptionsOpen = (state: boolean) => (optionsOpen.value = state);
+
+    const saveCatalogue = async (catalogue: Catalogue) => {
+      CRDCatalogue.value = catalogue;
+      await runWrappedCreateCatalogue();
+      setModalOpen(false);
+    };
+
+    const clickedAdd = () => {
+      CRDCatalogue.value = {
+        id: '',
+        name: '',
+        items: [],
+      };
+      setOptionsOpen(false);
+      setModalOpen(true);
+    };
+
+    const clickedOptions = (catalogue: Catalogue) => {
+      CRDCatalogue.value = catalogue;
+      setOptionsOpen(true);
+    };
 
     onMounted(async () => {
       try {
@@ -128,20 +168,15 @@ export default {
 
     const optionButtons: Button[] = [
       {
-        text: 'Add',
-        handler: () => {
-          console.log('Add');
-        },
-      },
-      {
         text: 'Edit',
         handler: () => {
-          console.log('Delete');
+          setModalOpen(true);
+          setOptionsOpen(false);
         },
       },
       {
         text: 'Delete',
-        role:"destructive",
+        role: 'destructive',
         handler: () => {
           console.log('Delete');
         },
@@ -151,7 +186,6 @@ export default {
         role: 'cancel',
         handler: () => {
           setOptionsOpen(false);
-          console.log('Cancel');
         },
       },
     ];
@@ -159,13 +193,18 @@ export default {
     return {
       catalogues,
       cataloguesLoading,
-      refreshCatalogues,
-      book,
       ellipsisHorizontal,
       ellipsisVertical,
       optionButtons,
       optionsOpen,
       setOptionsOpen,
+      addModalOpen,
+      setModalOpen,
+      CRDCatalogue,
+      saveCatalogue,
+      clickedAdd,
+      clickedOptions,
+      catalogueUploading,
     };
   },
 };
