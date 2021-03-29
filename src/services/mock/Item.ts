@@ -2,7 +2,24 @@ import { Errors, ItemFilter, ItemPage } from '../dtos';
 import { ItemService } from '../Item';
 import { Item } from '@/types';
 
-const Items: Item[] = [
+const items = (
+  catalogue: string,
+  prefix: string,
+  number: number,
+  starting = 0
+): Item[] => {
+  const w: Item[] = [];
+  for (let index = 0; index < number; index++) {
+    w.push({
+      id: '' + index + starting,
+      catalogue: catalogue,
+      name: prefix + index,
+    });
+  }
+  return w;
+};
+
+export const Items: Item[] = [
   {
     id: '0',
     catalogue: '0',
@@ -160,6 +177,11 @@ const Items: Item[] = [
   },
 ];
 
+Items.push(...items('0', 'wine ', 30, 28));
+Items.push(...items('1', 'fish ', 35, 58));
+Items.push(...items('2', 'vegetable ', 35, 93))
+
+
 export default class MockItemService implements ItemService {
   async GetItems(
     filter: ItemFilter,
@@ -176,17 +198,18 @@ export default class MockItemService implements ItemService {
     //PAGINATE
     //for (let i = (page - 1) * max; i < page * max; i++) {}
     const pageResult = items.filter((item, index) => {
-      return index >= (page - 1) * max && index <= page * max;
+      return index >= (page - 1) * max && index < page * max;
     });
-
     const result: ItemPage = {
       items: pageResult,
       pagination: {
-        total: this.pagesNum(items, max),
+        pages: this.pagesNum(items, max),
         next: 'next/url',
       },
     };
-
+    await new Promise((resolve) => {
+      setTimeout(resolve, 700);
+    });
     return result;
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
