@@ -1,4 +1,4 @@
-import { UserRole } from '@/types';
+import { UserRole, Item } from '@/types';
 
 export enum Errors {
   UsernameNotFound,
@@ -7,6 +7,11 @@ export enum Errors {
   CatalogueNotFound,
   Unexpected,
 }
+
+type Pagination = {
+  total: number;
+  next: string;
+};
 
 export interface NewUser {
   username: string;
@@ -21,4 +26,20 @@ export interface NewUser {
 
 export interface LoginResult {
   token: string;
+}
+
+export type ItemFilter = {
+  catalogue: string;
+};
+
+export interface ItemPage {
+  items: Item[];
+  pagination: Pagination;
+}
+
+export interface ItemDTO {
+  id?: string;
+  name: string;
+  description?: string;
+  image?: string;
 }
