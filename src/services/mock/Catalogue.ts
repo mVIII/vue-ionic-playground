@@ -1,27 +1,53 @@
 import { Catalogue } from '@/types';
 import { CatalogueService } from '../Catalogue';
 import { Errors } from '../dtos';
+import { Items } from './Item';
 
 const catalogues: Catalogue[] = [
   {
     id: '0',
     name: 'Wines 🥤',
+    itemCount: (function() {
+      return Items.filter((item) => {
+        return item.catalogue === '0';
+      }).length;
+    })(),
   },
   {
     id: '1',
     name: 'Fish',
+    itemCount: (function() {
+      return Items.filter((item) => {
+        return item.catalogue === '1';
+      }).length;
+    })(),
   },
   {
     id: '2',
     name: 'Vegetables',
+    itemCount: (function() {
+      return Items.filter((item) => {
+        return item.catalogue === '2';
+      }).length;
+    })(),
   },
   {
     id: '3',
     name: 'Meat',
+    itemCount: (function() {
+      return Items.filter((item) => {
+        return item.catalogue === '3';
+      }).length;
+    })(),
   },
   {
     id: '4',
     name: 'Legumes',
+    itemCount: (function() {
+      return Items.filter((item) => {
+        return item.catalogue === '4';
+      }).length;
+    })(),
   },
 ];
 
