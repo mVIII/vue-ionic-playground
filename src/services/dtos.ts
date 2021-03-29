@@ -9,7 +9,7 @@ export enum Errors {
 }
 
 type Pagination = {
-  total: number;
+  pages: number;
   next: string;
 };
 
