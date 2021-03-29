@@ -3,4 +3,5 @@ export type Catalogue = {
   name: string;
   icon?: string;
   description?: string;
+  itemCount: number;
 };
