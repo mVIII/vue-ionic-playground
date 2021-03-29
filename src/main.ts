@@ -29,6 +29,7 @@ import '@ionic/vue/css/display.css';
 import './theme/variables.css';
 import MockAuthenticationService from '@/services/mock/Authentication';
 import MockCatalogueService from '@/services/mock/Catalogue';
+import MockItemService from './services/mock/Item';
 
 container.register('Authentication', {
   useClass: MockAuthenticationService,
@@ -37,6 +38,11 @@ container.register('Authentication', {
 container.register('Catalogue', {
   useClass: MockCatalogueService,
 });
+
+container.register('Item', {
+  useClass: MockItemService,
+});
+
 
 const plugins = [];
 plugins.push(
