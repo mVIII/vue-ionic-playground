@@ -21,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'catalogue',
     component: () =>
       import(
-        /* webpackChunkName: "catalogue" */ '@/views/catalogue/Catalogue.vue'
+        /* webpackChunkName: "catalogue" */ '@/views/item/Catalogue.vue'
       ),
   },
   {

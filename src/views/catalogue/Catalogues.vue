@@ -21,7 +21,7 @@
             catalogue.name
           }}</ion-label>
           <ion-badge color="secondary" slot="end">{{
-            catalogue.items.length
+            catalogue.itemCount
           }}</ion-badge>
           <ion-buttons slot="end">
             <ion-button @click="clickedOptions(catalogue)">
@@ -140,7 +140,7 @@ export default {
       CRDCatalogue.value = {
         id: '',
         name: '',
-        items: [],
+        itemCount: 0,
       };
       setOptionsOpen(false);
       setModalOpen(true);
