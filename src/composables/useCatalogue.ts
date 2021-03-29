@@ -9,12 +9,14 @@ export function useCatalogue() {
   const selectedCatalogue = ref<Catalogue>({
     id: '',
     name: '',
+    itemCount: 0,
   });
 
   //CREATE/UPDATE/DELETE catalogue
   const CRDCatalogue = ref<Catalogue>({
     id: '',
     name: '',
+    itemCount: 0,
   });
 
   const catalogues = ref<Catalogue[]>([]);
@@ -33,6 +35,7 @@ export function useCatalogue() {
     CRDCatalogue.value = {
       id: '',
       name: '',
+      itemCount: 0,
     };
   }
 
@@ -61,6 +64,11 @@ export function useCatalogue() {
   }
 
   const {
+    active: catalogueLoading,
+    run: runWrappedGetCatalogue,
+  } = createAsyncProcess(getCatalogue);
+
+  const {
     active: cataloguesLoading,
     run: runWrappedGetCatalogues,
   } = createAsyncProcess(getCatalogues);
@@ -70,7 +78,7 @@ export function useCatalogue() {
     run: runWrappedCreateCatalogue,
   } = createAsyncProcess(createCatalogue);
 
-  watch(page, runWrappedGetCatalogues);
+  //watch(page, runWrappedGetCatalogues);
 
   return {
     displayedItems,
@@ -84,5 +92,7 @@ export function useCatalogue() {
     catalogueUploading,
     runWrappedCreateCatalogue,
     CRDCatalogue,
+    runWrappedGetCatalogue,
+    catalogueLoading,
   };
 }
