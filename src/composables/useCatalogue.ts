@@ -9,18 +9,18 @@ export function useCatalogue() {
   const selectedCatalogue = ref<Catalogue>({
     id: '',
     name: '',
-    items: [],
   });
 
   //CREATE/UPDATE/DELETE catalogue
   const CRDCatalogue = ref<Catalogue>({
     id: '',
     name: '',
-    items: [],
   });
 
   const catalogues = ref<Catalogue[]>([]);
   const displayedItems = ref<Item[]>([]);
+
+  const page = ref(1);
 
   const catalogueService = container.resolve<CatalogueService>('Catalogue');
 
@@ -33,12 +33,11 @@ export function useCatalogue() {
     CRDCatalogue.value = {
       id: '',
       name: '',
-      items: [],
     };
   }
 
   async function getCatalogues(): Promise<void> {
-    const result = await catalogueService.GetCatalogues();
+    const result = await catalogueService.GetCatalogues(page.value);
 
     if (result === Errors.Unexpected) {
       throw result;
@@ -61,17 +60,6 @@ export function useCatalogue() {
     event.target.complete();
   }
 
-  function filterDisplayedItems(query: string) {
-    const itemsToDisplay = selectedCatalogue.value.items
-      .map((item) =>
-        item.name.toLowerCase().indexOf(query.toLocaleLowerCase()) > -1
-          ? item
-          : null
-      )
-      .filter((v) => v) as Item[];
-    displayedItems.value = itemsToDisplay;
-  }
-
   const {
     active: cataloguesLoading,
     run: runWrappedGetCatalogues,
@@ -82,13 +70,10 @@ export function useCatalogue() {
     run: runWrappedCreateCatalogue,
   } = createAsyncProcess(createCatalogue);
 
-  watch(selectedCatalogue, () => {
-    displayedItems.value = selectedCatalogue.value.items;
-  });
+  watch(page, runWrappedGetCatalogues);
 
   return {
     displayedItems,
-    filterDisplayedItems,
     selectedCatalogue,
     catalogues,
     cataloguesLoading,
