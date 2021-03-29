@@ -2,10 +2,37 @@ import { Errors, ItemFilter, ItemPage } from '../dtos';
 import { ItemService } from '../Item';
 import { Item } from '@/types';
 
+const wineIcons: string[] = [
+  'https://www.greeceandgrapes.com/image/cache/catalog/Skouras/SkourasFleva-600x600.png',
+  'https://www.oinognosia.wine/wp-content/uploads/2018/05/assyrtiko_santo5.jpg',
+  'https://www.houseofwine.gr/how/media/catalog/product/cache/1/image/1200x1200/9df78eab33525d08d6e5fb8d27136e95/9/3/937.jpg',
+  'https://www.houseofwine.gr/how/media/catalog/product/cache/1/image/1200x1200/9df78eab33525d08d6e5fb8d27136e95/w/i/wines_1864_chateaumontrose.jpg',
+  'https://www.greeceandgrapes.com/image/cache/catalog/Skouras/Viognier-600x600.png',
+];
+
+const fishIcons: string[] = [
+  'https://api.time.com/wp-content/uploads/2019/11/fish-with-human-face-tik-tok-video.jpg',
+  'https://thumbs-prod.si-cdn.com/7UodV-s6j5aEVfrYwg5KQ26oBLY=/fit-in/1600x0/https://public-media.si-cdn.com/filer/d6/93/d6939718-4e41-44a8-a8f3-d13648d2bcd0/c3npbx.jpg',
+  'https://images.immediate.co.uk/production/volatile/sites/4/2009/07/GettyImages-931270318-43ab672.jpg',
+  'https://res.cloudinary.com/dk-find-out/image/upload/q_80,w_1920,f_auto/DCTM_Penguin_UK_DK_AL644648_p7nd0z.jpg',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQt5xBxOOmPdCfnK_r3_adTd4ts5S2BeFmWzA&usqp=CAU',
+];
+
+const vegetableIcons: string[] = [
+  'https://upload.wikimedia.org/wikipedia/commons/8/89/Tomato_je.jpg',
+  'https://hips.hearstapps.com/hmg-prod/images/delish-grilled-asparagus-1522951967.jpg',
+  'https://static.libertyprim.com/files/familles/celeri-large.jpg',
+  'https://images.immediate.co.uk/production/volatile/sites/30/2020/08/artichoke-title-image-e6dfc26.jpg',
+  'https://www.gardeningknowhow.com/wp-content/uploads/2020/03/primo-vantage-400x350.jpg',
+];
+
 const items = (
   catalogue: string,
   prefix: string,
+  description: string,
+  icons: string[],
   number: number,
+
   starting = 0
 ): Item[] => {
   const w: Item[] = [];
@@ -14,112 +41,14 @@ const items = (
       id: '' + index + starting,
       catalogue: catalogue,
       name: prefix + index,
+      description: description,
+      image: icons[Math.floor(Math.random() * icons.length)],
     });
   }
   return w;
 };
 
 export const Items: Item[] = [
-  {
-    id: '0',
-    catalogue: '0',
-    name: 'Beaucastel (Château)',
-  },
-  {
-    id: '1',
-    catalogue: '0',
-    name: 'Cheval Blanc (Château)',
-  },
-  {
-    id: '2',
-    catalogue: '0',
-    name: 'Corton-Charlemagne',
-  },
-  {
-    id: '3',
-    catalogue: '0',
-    name: 'Dom Pérignon',
-  },
-  {
-    id: '4',
-    catalogue: '0',
-    name: 'Ducru-Beaucaillou (Château)',
-  },
-  {
-    id: '5',
-    catalogue: '1',
-    name: 'Anchovy',
-  },
-  {
-    id: '6',
-    catalogue: '1',
-    name: 'Carp',
-  },
-  {
-    id: '7',
-    catalogue: '1',
-    name: 'Bobby',
-  },
-  {
-    id: '8',
-    catalogue: '1',
-    name: 'Bluefin Tuna',
-  },
-  {
-    id: '8',
-    catalogue: '1',
-    name: 'Salmon',
-  },
-  {
-    id: '9',
-    catalogue: '1',
-    name: 'Catafish',
-  },
-  {
-    id: '10',
-    catalogue: '1',
-    name: 'Hammerhead shark',
-  },
-  {
-    id: '11',
-    catalogue: '1',
-    name: 'Clownfish',
-  },
-  {
-    id: '12',
-    catalogue: '2',
-    name: 'Tomatos',
-  },
-  {
-    id: '13',
-    catalogue: '2',
-    name: 'Cellery',
-  },
-  {
-    id: '14',
-    catalogue: '2',
-    name: 'Potatos',
-  },
-  {
-    id: '15',
-    catalogue: '2',
-    name: 'Onions',
-  },
-  {
-    id: '15',
-    catalogue: '2',
-    name: 'Eggplants',
-  },
-  {
-    id: '16',
-    catalogue: '2',
-    name: 'Raddish',
-  },
-  {
-    id: '17',
-    catalogue: '2',
-    name: 'Green Onions',
-  },
   {
     id: '18',
     catalogue: '3',
@@ -177,10 +106,11 @@ export const Items: Item[] = [
   },
 ];
 
-Items.push(...items('0', 'wine ', 30, 28));
-Items.push(...items('1', 'fish ', 35, 58));
-Items.push(...items('2', 'vegetable ', 35, 93))
-
+Items.push(...items('0', 'wine ', 'This a wine', wineIcons, 30, 28));
+Items.push(...items('1', 'fish ', 'This a fish', fishIcons, 35, 58));
+Items.push(
+  ...items('2', 'vegetable ', 'This a vegetable', vegetableIcons, 35, 93)
+);
 
 export default class MockItemService implements ItemService {
   async GetItems(
