@@ -19,7 +19,13 @@
           {{ selectedCatalogue.name }}
         </ion-list-header>
         <ion-item v-for="item in displayedItems" :key="item.name">
-          <ion-label>{{ item.name }}</ion-label>
+          <ion-avatar slot="start">
+            <img :src="item.image" />
+          </ion-avatar>
+          <ion-label
+            ><h2>{{ item.name }}</h2>
+            <p>{{ item.description }}</p></ion-label
+          >
         </ion-item>
       </ion-list>
       <ion-infinite-scroll
@@ -61,6 +67,7 @@ import {
   IonLoading,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  IonAvatar,
 } from '@ionic/vue';
 
 import { useItem } from '@/composables/useItem';
@@ -86,6 +93,7 @@ export default {
     IonBackButton,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
+    IonAvatar,
   },
   setup() {
     const {
@@ -114,7 +122,6 @@ export default {
         console.log(error);
       }
     });
-    
 
     return {
       selectedCatalogue,
