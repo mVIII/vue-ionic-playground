@@ -47,12 +47,12 @@
       :buttons="optionButtons"
     >
     </ion-action-sheet>
-    <ion-modal :is-open="addModalOpen">
-      <CatalogueNew
-        @dismiss="setModalOpen(false)"
+    <ion-modal :is-open="addEditModalOpen">
+      <CatalogueNewEdit
+        @dismiss="setAddEditModalOpen(false)"
         @save="saveCatalogue"
         :catalogue="CRDCatalogue"
-      ></CatalogueNew>
+      ></CatalogueNewEdit>
     </ion-modal>
   </ion-page>
 </template>
@@ -83,7 +83,7 @@ import { onMounted } from '@vue/runtime-core';
 import router from '@/router';
 import { ellipsisVertical, ellipsisHorizontal } from 'ionicons/icons';
 import { ref } from 'vue';
-import CatalogueNew from './NewEdit.vue';
+import CatalogueNewEdit from './NewEdit.vue';
 import { Catalogue } from '@/types';
 
 export default {
@@ -106,7 +106,7 @@ export default {
     IonIcon,
     IonRefresherContent,
     IonActionSheet,
-    CatalogueNew,
+    CatalogueNewEdit,
     IonModal,
   },
   methods: {
@@ -124,8 +124,9 @@ export default {
       runWrappedCreateCatalogue,
     } = useCatalogue();
 
-    const addModalOpen = ref(false);
-    const setModalOpen = (state: boolean) => (addModalOpen.value = state);
+    const addEditModalOpen = ref(false);
+    const setAddEditModalOpen = (state: boolean) =>
+      (addEditModalOpen.value = state);
 
     const optionsOpen = ref(false);
     const setOptionsOpen = (state: boolean) => (optionsOpen.value = state);
@@ -133,7 +134,7 @@ export default {
     const saveCatalogue = async (catalogue: Catalogue) => {
       CRDCatalogue.value = catalogue;
       await runWrappedCreateCatalogue();
-      setModalOpen(false);
+      setAddEditModalOpen(false);
     };
 
     const clickedAdd = () => {
@@ -144,7 +145,7 @@ export default {
         ItemSchema: [],
       };
       setOptionsOpen(false);
-      setModalOpen(true);
+      setAddEditModalOpen(true);
     };
 
     const clickedOptions = (catalogue: Catalogue) => {
@@ -171,7 +172,7 @@ export default {
       {
         text: 'Edit',
         handler: () => {
-          setModalOpen(true);
+          setAddEditModalOpen(true);
           setOptionsOpen(false);
         },
       },
@@ -199,8 +200,8 @@ export default {
       optionButtons,
       optionsOpen,
       setOptionsOpen,
-      addModalOpen,
-      setModalOpen,
+      addEditModalOpen,
+      setAddEditModalOpen,
       CRDCatalogue,
       saveCatalogue,
       clickedAdd,
