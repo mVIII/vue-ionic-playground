@@ -6,6 +6,9 @@
         <ion-buttons slot="start">
           <ion-back-button default-href="/catalogues"></ion-back-button>
         </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button @click="clickedAdd()">Add</ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -35,6 +38,14 @@
           :catalogue="selectedCatalogue"
           :itemFilter="itemFilter"
         ></ItemFilter>
+      </ion-modal>
+      <ion-modal :is-open="addEditModalOpen">
+        <ItemNewEdit
+          @dismiss="setAddEditModalOpen(false)"
+          @save="applyFilter"
+          :catalogue="selectedCatalogue"
+          :item="itemFilter"
+        ></ItemNewEdit>
       </ion-modal>
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button @click="setFilterModalOpen(true)">
@@ -85,6 +96,7 @@ import {
   IonFabButton,
   IonModal,
   IonIcon,
+  IonButton,
 } from '@ionic/vue';
 
 import { useItem } from '@/composables/useItem';
@@ -95,6 +107,7 @@ import { options } from 'ionicons/icons';
 import ItemFilter from './Filter.vue';
 import { ref } from 'vue';
 import { Filter } from '@/services/dtos';
+import ItemNewEdit from './NewEdit.vue';
 
 export default {
   name: 'Catalogue',
@@ -120,6 +133,8 @@ export default {
     ItemFilter,
     IonModal,
     IonIcon,
+    IonButton,
+    ItemNewEdit,
   },
   setup() {
     const {
@@ -131,6 +146,7 @@ export default {
       infiteLoadCatalogueItems,
       catalogueID,
       page,
+      CRUDItem,
     } = useItem();
 
     const {
@@ -153,9 +169,23 @@ export default {
     const setFilterModalOpen = (state: boolean) =>
       (filterModalOpen.value = state);
 
+    const addEditModalOpen = ref(false);
+    const setAddEditModalOpen = (state: boolean) =>
+      (addEditModalOpen.value = state);
+
     const applyFilter = async (newItemFilter: Filter) => {
       itemFilter.value = newItemFilter;
       setFilterModalOpen(false);
+    };
+
+    const clickedAdd = () => {
+      CRUDItem.value = {
+        id: '',
+        catalogue: '',
+        name: '',
+        fields: [],
+      };
+      setAddEditModalOpen(true);
     };
 
     return {
@@ -171,6 +201,9 @@ export default {
       options,
       applyFilter,
       page,
+      addEditModalOpen,
+      setAddEditModalOpen,
+      clickedAdd,
     };
   },
 };
