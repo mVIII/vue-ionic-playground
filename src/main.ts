@@ -30,6 +30,7 @@ import './theme/variables.css';
 import MockAuthenticationService from '@/services/mock/Authentication';
 import MockCatalogueService from '@/services/mock/Catalogue';
 import MockItemService from './services/mock/Item';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
 container.register('Authentication', {
   useClass: MockAuthenticationService,
@@ -42,7 +43,6 @@ container.register('Catalogue', {
 container.register('Item', {
   useClass: MockItemService,
 });
-
 
 const plugins = [];
 plugins.push(
@@ -58,4 +58,6 @@ const app = createApp(App)
 
 router.isReady().then(() => {
   app.mount('#app');
+
+  defineCustomElements(window);
 });
