@@ -174,7 +174,6 @@ export default class MockItemService implements ItemService {
     let items: Item[] = Items.filter((item) => {
       return item.catalogue === catalogueID;
     });
-    console.log("FILTERING")
     filter.aggregations.forEach((aggregation) => {
       if (aggregation.type === AggregationType.eq) {
         const result = items.filter((item) => {
@@ -182,7 +181,6 @@ export default class MockItemService implements ItemService {
             (aggregation.query as string[]).includes(field.value)
           );
         });
-        console.log(result);
         items = result;
       } else {
         items = [];
