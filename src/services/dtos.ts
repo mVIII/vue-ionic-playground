@@ -1,4 +1,4 @@
-import { UserRole, Item } from '@/types';
+import { UserRole, Item, schemaField } from '@/types';
 
 export enum Errors {
   UsernameNotFound,
@@ -28,8 +28,22 @@ export interface LoginResult {
   token: string;
 }
 
-export type ItemFilter = {
-  catalogue: string;
+export enum AggregationType {
+  eq,
+  bigger,
+  smaller,
+  biggerEq,
+  smallerEq,
+}
+
+export type Aggregation = {
+  query: string[] | boolean | number | string;
+  type: AggregationType;
+  field: schemaField;
+};
+
+export type Filter = {
+  aggregations: Aggregation[];
 };
 
 export interface ItemPage {
