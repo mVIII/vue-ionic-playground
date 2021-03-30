@@ -50,7 +50,7 @@ import { PropType } from '@vue/runtime-core';
 import { ref } from 'vue';
 
 export default {
-  name: 'CatalogueNew',
+  name: 'CatalogueNewEdit',
   components: {
     IonButtons,
     IonTitle,
