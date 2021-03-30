@@ -1,4 +1,4 @@
-import { Catalogue } from '@/types';
+import { Catalogue, FieldTypes } from '@/types';
 import { CatalogueService } from '../Catalogue';
 import { Errors } from '../dtos';
 import { Items } from './Item';
@@ -12,6 +12,13 @@ const catalogues: Catalogue[] = [
         return item.catalogue === '0';
       }).length;
     })(),
+    ItemSchema: [
+      {
+        name: 'color',
+        type: FieldTypes.Enum,
+        enum: ['red', 'rose', 'white'],
+      },
+    ],
   },
   {
     id: '1',
@@ -21,6 +28,7 @@ const catalogues: Catalogue[] = [
         return item.catalogue === '1';
       }).length;
     })(),
+    ItemSchema: [],
   },
   {
     id: '2',
@@ -30,6 +38,7 @@ const catalogues: Catalogue[] = [
         return item.catalogue === '2';
       }).length;
     })(),
+    ItemSchema: [],
   },
   {
     id: '3',
@@ -39,6 +48,7 @@ const catalogues: Catalogue[] = [
         return item.catalogue === '3';
       }).length;
     })(),
+    ItemSchema: [],
   },
   {
     id: '4',
@@ -48,6 +58,7 @@ const catalogues: Catalogue[] = [
         return item.catalogue === '4';
       }).length;
     })(),
+    ItemSchema: [],
   },
 ];
 

@@ -1,6 +1,6 @@
-import { Errors, ItemFilter, ItemPage } from '../dtos';
+import { AggregationType, Errors, Filter, ItemPage } from '../dtos';
 import { ItemService } from '../Item';
-import { Item } from '@/types';
+import { FieldTypes, Item } from '@/types';
 
 const wineIcons: string[] = [
   'https://www.greeceandgrapes.com/image/cache/catalog/Skouras/SkourasFleva-600x600.png',
@@ -43,6 +43,37 @@ const items = (
       name: prefix + index,
       description: description,
       image: icons[Math.floor(Math.random() * icons.length)],
+      fields: [],
+    });
+  }
+  return w;
+};
+
+const makeWines = (
+  catalogue: string,
+  prefix: string,
+  description: string,
+  colors: string[],
+  icons: string[],
+  number: number,
+
+  starting = 0
+): Item[] => {
+  const w: Item[] = [];
+  for (let index = 0; index < number; index++) {
+    w.push({
+      id: '' + index + starting,
+      catalogue: catalogue,
+      name: prefix + index,
+      description: description,
+      image: icons[Math.floor(Math.random() * icons.length)],
+      fields: [
+        {
+          name: 'color',
+          type: FieldTypes.Enum,
+          value: colors[Math.floor(Math.random() * colors.length)],
+        },
+      ],
     });
   }
   return w;
@@ -53,60 +84,81 @@ export const Items: Item[] = [
     id: '18',
     catalogue: '3',
     name: 'Jamón ibérico',
+    fields: [],
   },
   {
     id: '19',
     catalogue: '3',
     name: 'Sirloin(Prime)',
+    fields: [],
   },
   {
     id: '20',
     catalogue: '3',
     name: 'Sirloin(Choise)',
+    fields: [],
   },
   {
     id: '21',
     catalogue: '3',
     name: 'Tomahwk(Choice)',
+    fields: [],
   },
   {
     id: '22',
     catalogue: '3',
     name: 'Brisket(Prime)',
+    fields: [],
   },
   {
     id: '23',
     catalogue: '3',
     name: 'Ribeye(Wagyu A5)',
+    fields: [],
   },
   {
     id: '24',
     catalogue: '4',
     name: 'Cheakpeas',
+    fields: [],
   },
   {
     id: '25',
     catalogue: '4',
     name: 'Lentils',
+    fields: [],
   },
   {
     id: '26',
     catalogue: '4',
     name: 'Green beans',
+    fields: [],
   },
   {
     id: '27',
     catalogue: '4',
     name: 'Beans',
+    fields: [],
   },
   {
     id: '28',
     catalogue: '4',
     name: 'Fava',
+    fields: [],
   },
 ];
 
-Items.push(...items('0', 'wine ', 'This a wine', wineIcons, 30, 28));
+Items.push(
+  ...makeWines(
+    '0',
+    'wine ',
+    'This a wine',
+    ['red', 'white', 'rose'],
+    wineIcons,
+    30,
+    28
+  )
+);
 Items.push(...items('1', 'fish ', 'This a fish', fishIcons, 35, 58));
 Items.push(
   ...items('2', 'vegetable ', 'This a vegetable', vegetableIcons, 35, 93)
@@ -114,17 +166,44 @@ Items.push(
 
 export default class MockItemService implements ItemService {
   async GetItems(
-    filter: ItemFilter,
+    filter: Filter,
     page: number,
     max = 5
   ): Promise<ItemPage | Errors.Unexpected> {
-    let items: Item[] = [];
+    let items: Item[] = Items;
+    filter.aggregations.forEach((aggregation) => {
+      if (aggregation.field.name === 'catalogue') {
+        items = Items.filter((item) => {
+          return item.catalogue === aggregation.query;
+        });
+      } else if (aggregation.type === AggregationType.eq) {
+        const result = items.filter((item) => {
+          return item.fields.some(
+            (field) =>
+              field.name === aggregation.field.name &&
+              (aggregation.query as string[]).includes(field.value)
+          );
 
-    if (filter.catalogue !== '') {
-      items = Items.filter((item) => {
-        return item.catalogue == filter.catalogue;
-      });
-    }
+          // return item.fields
+          //   .filter((field) => {
+          //     return field.name === aggregation.field ;
+          //   })
+          //   .filter((field) => {
+          //     return aggregation.values.includes(field.value);
+          //   });
+        });
+        console.log(result);
+        items = result;
+      } else {
+        items = [];
+      }
+    });
+
+    // if (filter.catalogue !== '') {
+    //   items = Items.filter((item) => {
+    //     return item.catalogue == filter.catalogue;
+    //   });
+    // }
     //PAGINATE
     //for (let i = (page - 1) * max; i < page * max; i++) {}
     const pageResult = items.filter((item, index) => {

@@ -141,6 +141,7 @@ export default {
         id: '',
         name: '',
         itemCount: 0,
+        ItemSchema: [],
       };
       setOptionsOpen(false);
       setModalOpen(true);

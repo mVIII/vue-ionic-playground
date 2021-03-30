@@ -1,4 +1,4 @@
-import { Errors, ItemFilter } from '@/services/dtos';
+import { Errors, Filter } from '@/services/dtos';
 import { ItemService } from '@/services/Item';
 import { Item } from '@/types';
 import createAsyncProcess from '@/utils/create-async-process';
@@ -10,19 +10,19 @@ export function useItem() {
   const displayedItems = ref<Item[]>([]);
   const page = ref(1);
   const totalPages = ref(1);
-  const itemFilter = ref<ItemFilter>({
-    catalogue: '',
+  const itemFilter = ref<Filter>({
+    aggregations: [],
   });
 
   const itemService = container.resolve<ItemService>('Item');
 
   async function getItems(): Promise<void> {
-  
     const result = await itemService.GetItems(itemFilter.value, page.value, 20);
 
     if (result === Errors.Unexpected) {
       throw result;
     }
+
     items.value = result.items;
     displayedItems.value = items.value;
     totalPages.value = result.pagination.pages;
@@ -60,7 +60,7 @@ export function useItem() {
 
   //watch(page, runWrappedGetItems);
 
-  //watch(itemFilter, runWrappedGetItems);
+  watch(itemFilter, runWrappedGetItems);
 
   watch(loadingGet, () => {
     itemsLoading.value = loadingGet.value;

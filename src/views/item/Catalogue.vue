@@ -28,6 +28,19 @@
           >
         </ion-item>
       </ion-list>
+      <ion-modal :is-open="filterModalOpen">
+        <ItemFilter
+          @dismiss="setFilterModalOpen(false)"
+          @apply="applyFilter"
+          :catalogue="selectedCatalogue"
+          :itemFilter="itemFilter"
+        ></ItemFilter>
+      </ion-modal>
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button @click="setFilterModalOpen(true)">
+          <ion-icon :icon="filterCircleOutline"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
       <ion-infinite-scroll
         @ionInfinite="infiteLoadItems($event)"
         threshold="100px"
@@ -68,12 +81,21 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonAvatar,
+  IonFab,
+  IonFabButton,
+  IonModal,
+  IonIcon,
 } from '@ionic/vue';
 
 import { useItem } from '@/composables/useItem';
 import { onMounted } from '@vue/runtime-core';
 import router from '@/router';
 import { useCatalogue } from '@/composables/useCatalogue';
+import { filterCircleOutline } from 'ionicons/icons';
+import ItemFilter from './Filter.vue';
+import { ref } from 'vue';
+import { AggregationType, Filter } from '@/services/dtos';
+import { FieldTypes } from '@/types';
 
 export default {
   name: 'Catalogue',
@@ -94,6 +116,11 @@ export default {
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     IonAvatar,
+    IonFabButton,
+    IonFab,
+    ItemFilter,
+    IonModal,
+    IonIcon,
   },
   setup() {
     const {
@@ -102,7 +129,6 @@ export default {
       itemsLoading,
       displayedItems,
       itemFilter,
-      page,
       infiteLoadItems,
     } = useItem();
 
@@ -116,12 +142,28 @@ export default {
       try {
         const catalogueID = router.currentRoute.value.params.id as string;
         await getCatalogue(catalogueID);
-        itemFilter.value = { catalogue: catalogueID };
+        itemFilter.value = {
+          aggregations: [
+            {
+              query: catalogueID,
+              type: AggregationType.eq,
+              field: { name: 'catalogue', type: FieldTypes.String },
+            },
+          ],
+        };
         await runWrappedGetItems();
       } catch (error) {
         console.log(error);
       }
     });
+    const filterModalOpen = ref(false);
+    const setFilterModalOpen = (state: boolean) =>
+      (filterModalOpen.value = state);
+
+    const applyFilter = async (newItemFilter: Filter) => {
+      itemFilter.value = newItemFilter;
+      setFilterModalOpen(false);
+    };
 
     return {
       selectedCatalogue,
@@ -130,6 +172,11 @@ export default {
       filterDisplayedItems,
       displayedItems,
       infiteLoadItems,
+      filterModalOpen,
+      setFilterModalOpen,
+      itemFilter,
+      filterCircleOutline,
+      applyFilter,
     };
   },
 };

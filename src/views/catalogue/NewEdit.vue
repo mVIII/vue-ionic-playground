@@ -68,7 +68,7 @@ export default {
   props: {
     catalogue: {
       type: Object as PropType<Catalogue>,
-      default: { id: '', name: '', items: [] },
+      default: { id: '', name: '', itemCount: 0, ItemSchema: [] },
     },
   },
   setup(props: any): Record<string, unknown> {
