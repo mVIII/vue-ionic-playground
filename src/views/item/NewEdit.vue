@@ -7,13 +7,20 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
+
   <ion-content :fullscreen="true">
     <div class="container">
-      <img
-        class="item-image"
-        :src="imageSrc"
-        @click="setImageActionSheetOpen(true)"
-      />
+      <div class="item-avatar">
+        <img
+          class="item-image"
+          src="https://www.houseofwine.gr/how/media/catalog/product/cache/1/image/600x600/9df78eab33525d08d6e5fb8d27136e95/b/0/b0089_estrella_inedit.jpg"
+        />
+        <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+          <ion-fab-button @click="setImageActionSheetOpen(true)">
+            <ion-icon :icon="cameraOutline"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </div>
     </div>
     <ion-list lines="full" class="ion-no-margin">
       <ion-list-header lines="full">
@@ -23,17 +30,14 @@
       </ion-list-header>
       <ion-item>
         <ion-label>Name</ion-label>
-        <ion-input placeholder="Name" v-model="c.name"></ion-input>
+        <ion-input placeholder="Name"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="stacked">Description</ion-label>
-        <ion-input
-          placeholder="Description"
-          v-model="c.description"
-        ></ion-input>
+        <ion-input placeholder="Description"></ion-input>
       </ion-item>
     </ion-list>
-    <ion-button expand="block" @click="$emit('save', c)">Add</ion-button>
+    <ion-button expand="block">Add</ion-button>
   </ion-content>
   <ion-action-sheet
     :is-open="imageActionSheetOpen"
@@ -57,12 +61,14 @@ import {
   IonLabel,
   IonButton,
   IonActionSheet,
+  IonIcon,
+  IonFab,
 } from '@ionic/vue';
-import { add } from 'ionicons/icons';
+import { cameraOutline } from 'ionicons/icons';
 import { Catalogue, Item } from '@/types';
 import { PropType } from '@vue/runtime-core';
 import { ref } from 'vue';
-import { Plugins, CameraResultType } from '@capacitor/core';
+import { Plugins, CameraResultType, CameraSource } from '@capacitor/core';
 const { Camera } = Plugins;
 
 export default {
@@ -80,6 +86,8 @@ export default {
     IonLabel,
     IonButton,
     IonActionSheet,
+    IonIcon,
+    IonFab,
   },
   emits: ['dismiss', 'save'],
   props: {
@@ -93,14 +101,11 @@ export default {
     },
   },
   setup(props: any): Record<string, unknown> {
-    const title =
-      props.catalogue.name === '' ? 'New Catalogue' : props.catalogue.name;
+    const title = props.item.name === '' ? 'New Item' : props.item.name;
 
-    const imageSrc = ref<string>(
-      'https://www.houseofwine.gr/how/media/catalog/product/cache/1/image/600x600/9df78eab33525d08d6e5fb8d27136e95/b/0/b0089_estrella_inedit.jpg'
-    );
+    const itemRef = ref<Item>(props.item);
 
-    const c = ref<Catalogue>(props.catalogue);
+    const addImageIcon = '';
 
     const imageActionSheetOpen = ref(false);
     const setImageActionSheetOpen = (state: boolean) =>
@@ -115,13 +120,15 @@ export default {
 
     const takePicture = async () => {
       const image = await Camera.getPhoto({
-        quality: 90,
+        quality: 100,
         allowEditing: true,
+        source: CameraSource.Prompt,
         resultType: CameraResultType.Uri,
       });
+
       const imageUrl = image.webPath;
       if (imageUrl) {
-        imageSrc.value = imageUrl;
+        itemRef.value.image = imageUrl;
       }
     };
 
@@ -151,9 +158,8 @@ export default {
     ];
 
     return {
-      imageSrc,
-      add,
-      c,
+      cameraOutline,
+      itemRef,
       title,
       imageActionSheet,
       imageActionSheetOpen,
@@ -164,16 +170,25 @@ export default {
 </script>
 <style scoped>
 .item-image {
-  margin: 10px;
   border: 1px solid grey !important;
   border-radius: 100px;
-  max-width: 120px;
-  max-height: 120px;
+  max-width: 135px;
+  max-height: 135px;
+  margin: 5px;
 }
-
+.item-avatar {
+  position: relative;
+}
 .container {
+  margin: 10px;
   width: 100%;
   display: flex;
+
   justify-content: space-evenly;
+}
+
+ion-fab-button {
+  width: 36px;
+  height: 36px;
 }
 </style>
