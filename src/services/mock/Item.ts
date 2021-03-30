@@ -165,32 +165,22 @@ Items.push(
 );
 
 export default class MockItemService implements ItemService {
-  async GetItems(
+  async GetItemsByCatalogue(
+    catalogueID: string,
     filter: Filter,
     page: number,
     max = 5
   ): Promise<ItemPage | Errors.Unexpected> {
-    let items: Item[] = Items;
+    let items: Item[] = Items.filter((item) => {
+      return item.catalogue === catalogueID;
+    });
+    console.log("FILTERING")
     filter.aggregations.forEach((aggregation) => {
-      if (aggregation.field.name === 'catalogue') {
-        items = Items.filter((item) => {
-          return item.catalogue === aggregation.query;
-        });
-      } else if (aggregation.type === AggregationType.eq) {
+      if (aggregation.type === AggregationType.eq) {
         const result = items.filter((item) => {
-          return item.fields.some(
-            (field) =>
-              field.name === aggregation.field.name &&
-              (aggregation.query as string[]).includes(field.value)
+          return item.fields.some((field) =>
+            (aggregation.query as string[]).includes(field.value)
           );
-
-          // return item.fields
-          //   .filter((field) => {
-          //     return field.name === aggregation.field ;
-          //   })
-          //   .filter((field) => {
-          //     return aggregation.values.includes(field.value);
-          //   });
         });
         console.log(result);
         items = result;
@@ -199,13 +189,6 @@ export default class MockItemService implements ItemService {
       }
     });
 
-    // if (filter.catalogue !== '') {
-    //   items = Items.filter((item) => {
-    //     return item.catalogue == filter.catalogue;
-    //   });
-    // }
-    //PAGINATE
-    //for (let i = (page - 1) * max; i < page * max; i++) {}
     const pageResult = items.filter((item, index) => {
       return index >= (page - 1) * max && index < page * max;
     });

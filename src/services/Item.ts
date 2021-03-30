@@ -1,8 +1,9 @@
-import { Errors, ItemPage, ItemFilter } from './dtos';
+import { Errors, ItemPage, Filter } from './dtos';
 
 export interface ItemService {
-  GetItems(
-    filter: ItemFilter,
+  GetItemsByCatalogue(
+    catalogueID: string,
+    filter: Filter,
     page: number,
     max?: number
   ): Promise<ItemPage | Errors.Unexpected>;

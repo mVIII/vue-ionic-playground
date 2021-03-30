@@ -13,24 +13,36 @@ export function useItem() {
   const itemFilter = ref<Filter>({
     aggregations: [],
   });
+  const catalogueID = ref<string>('');
 
   const itemService = container.resolve<ItemService>('Item');
 
-  async function getItems(): Promise<void> {
-    const result = await itemService.GetItems(itemFilter.value, page.value, 20);
+  async function getItemsByCatalogue(): Promise<void> {
+    page.value = 1;
+    const result = await itemService.GetItemsByCatalogue(
+      catalogueID.value,
+      itemFilter.value,
+      page.value,
+      20
+    );
 
     if (result === Errors.Unexpected) {
       throw result;
     }
-
     items.value = result.items;
-    displayedItems.value = items.value;
+    displayedItems.value = result.items;
+    console.log(displayedItems.value);
     totalPages.value = result.pagination.pages;
   }
 
-  async function infiteLoadItems(ev: any): Promise<void> {
+  async function infiteLoadCatalogueItems(ev: any): Promise<void> {
     page.value++;
-    const result = await itemService.GetItems(itemFilter.value, page.value, 20);
+    const result = await itemService.GetItemsByCatalogue(
+      catalogueID.value,
+      itemFilter.value,
+      page.value,
+      20
+    );
 
     if (result === Errors.Unexpected) {
       throw result;
@@ -54,13 +66,14 @@ export function useItem() {
   }
   const itemsLoading = ref<boolean>(false);
 
-  const { active: loadingGet, run: runWrappedGetItems } = createAsyncProcess(
-    getItems
-  );
+  const {
+    active: loadingGet,
+    run: runWrappedGetItemsByCatalogue,
+  } = createAsyncProcess(getItemsByCatalogue);
 
   //watch(page, runWrappedGetItems);
 
-  watch(itemFilter, runWrappedGetItems);
+  watch(itemFilter, runWrappedGetItemsByCatalogue);
 
   watch(loadingGet, () => {
     itemsLoading.value = loadingGet.value;
@@ -68,11 +81,12 @@ export function useItem() {
 
   return {
     itemsLoading,
-    runWrappedGetItems,
-    infiteLoadItems,
+    runWrappedGetItemsByCatalogue,
+    infiteLoadCatalogueItems,
     filterDisplayedItems,
     displayedItems,
     itemFilter,
     page,
+    catalogueID,
   };
 }

@@ -54,7 +54,7 @@ import {
 
 import { ref } from 'vue';
 import { close } from 'ionicons/icons';
-import { AggregationType, Filter } from '@/services/dtos';
+import { Aggregation, AggregationType, Filter } from '@/services/dtos';
 import { PropType, SetupContext } from '@vue/runtime-core';
 import { Catalogue, FieldTypes } from '@/types';
 export default {
@@ -100,6 +100,8 @@ export default {
     const selectedCatalogue = ref<Catalogue>(props.catalogue);
     const itemFilter = props.itemFilter as Filter;
     const filterViews = ref<filterView[]>([]);
+
+    const newFilter = ref<Filter>({ aggregations: [] });
 
     //TODO REFACTOR ASAP
     //ONE FILTER FOR EACH SCHEMA ITEM
@@ -188,19 +190,33 @@ export default {
     };
 
     const applyFilter = () => {
-      const aggregations = filterViews.value.map((fview) => {
-        return {
-          query: fview.value,
-          type: AggregationType.eq,
-          field: {
-            name: fview.name,
-            type: fview.type,
-            enum: fview.enum,
-          },
-        };
-      });
+      const aggregations = filterViews.value
+        .map((fview) => {
+          return {
+            query: fview.value,
+            type: AggregationType.eq,
+            field: {
+              name: fview.name,
+              type: fview.type,
+              enum: fview.enum,
+            },
+          };
+        })
+        .map((aggregation) => {
+          switch (aggregation.field.type) {
+            case FieldTypes.String:
+              return (aggregation.query as string) === '' ? null : aggregation;
+            case FieldTypes.Enum:
+              return (aggregation.query as string[]).length === 0
+                ? null
+                : aggregation;
+            default:
+              return aggregation;
+          }
+        })
+        .filter((v) => v) as Aggregation[];
       const newItemFilter: Filter = {
-        aggregations: [...itemFilter.aggregations, ...aggregations],
+        aggregations: aggregations,
       };
       console.log(newItemFilter);
       context.emit('apply', newItemFilter);

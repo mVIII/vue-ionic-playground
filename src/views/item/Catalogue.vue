@@ -38,11 +38,11 @@
       </ion-modal>
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button @click="setFilterModalOpen(true)">
-          <ion-icon :icon="filterCircleOutline"></ion-icon>
+          <ion-icon :icon="options"></ion-icon>
         </ion-fab-button>
       </ion-fab>
       <ion-infinite-scroll
-        @ionInfinite="infiteLoadItems($event)"
+        @ionInfinite="infiteLoadCatalogueItems($event)"
         threshold="100px"
         id="infinite-scroll"
       >
@@ -91,11 +91,10 @@ import { useItem } from '@/composables/useItem';
 import { onMounted } from '@vue/runtime-core';
 import router from '@/router';
 import { useCatalogue } from '@/composables/useCatalogue';
-import { filterCircleOutline } from 'ionicons/icons';
+import { options } from 'ionicons/icons';
 import ItemFilter from './Filter.vue';
 import { ref } from 'vue';
-import { AggregationType, Filter } from '@/services/dtos';
-import { FieldTypes } from '@/types';
+import { Filter } from '@/services/dtos';
 
 export default {
   name: 'Catalogue',
@@ -124,34 +123,28 @@ export default {
   },
   setup() {
     const {
-      runWrappedGetItems,
+      runWrappedGetItemsByCatalogue,
       filterDisplayedItems,
       itemsLoading,
       displayedItems,
       itemFilter,
-      infiteLoadItems,
+      infiteLoadCatalogueItems,
+      catalogueID,
+      page,
     } = useItem();
 
     const {
-      selectedCatalogue,
-      getCatalogue,
+      runWrappedGetCatalogue,
       catalogueLoading,
+      selectedCatalogue,
     } = useCatalogue();
 
     onMounted(async () => {
       try {
-        const catalogueID = router.currentRoute.value.params.id as string;
-        await getCatalogue(catalogueID);
-        itemFilter.value = {
-          aggregations: [
-            {
-              query: catalogueID,
-              type: AggregationType.eq,
-              field: { name: 'catalogue', type: FieldTypes.String },
-            },
-          ],
-        };
-        await runWrappedGetItems();
+        const catalogueId = router.currentRoute.value.params.id as string;
+        await runWrappedGetCatalogue(catalogueId);
+        catalogueID.value = catalogueId;
+        await runWrappedGetItemsByCatalogue();
       } catch (error) {
         console.log(error);
       }
@@ -171,12 +164,13 @@ export default {
       itemsLoading,
       filterDisplayedItems,
       displayedItems,
-      infiteLoadItems,
+      infiteLoadCatalogueItems,
       filterModalOpen,
       setFilterModalOpen,
       itemFilter,
-      filterCircleOutline,
+      options,
       applyFilter,
+      page,
     };
   },
 };
