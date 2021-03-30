@@ -10,6 +10,7 @@ export function useCatalogue() {
     id: '',
     name: '',
     itemCount: 0,
+    ItemSchema: [],
   });
 
   //CREATE/UPDATE/DELETE catalogue
@@ -17,6 +18,7 @@ export function useCatalogue() {
     id: '',
     name: '',
     itemCount: 0,
+    ItemSchema: [],
   });
 
   const catalogues = ref<Catalogue[]>([]);
@@ -36,6 +38,7 @@ export function useCatalogue() {
       id: '',
       name: '',
       itemCount: 0,
+      ItemSchema: [],
     };
   }
 
