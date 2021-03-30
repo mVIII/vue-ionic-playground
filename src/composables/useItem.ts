@@ -17,6 +17,13 @@ export function useItem() {
 
   const itemService = container.resolve<ItemService>('Item');
 
+  const CRUDItem = ref<Item>({
+    id: '',
+    catalogue: '',
+    name: '',
+    fields: [],
+  });
+
   async function getItemsByCatalogue(): Promise<void> {
     page.value = 1;
     const result = await itemService.GetItemsByCatalogue(
@@ -88,5 +95,6 @@ export function useItem() {
     itemFilter,
     page,
     catalogueID,
+    CRUDItem,
   };
 }
