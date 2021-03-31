@@ -24,6 +24,13 @@ export function useItem() {
     fields: [],
   });
 
+  async function createItem(): Promise<void> {
+    const result = await itemService.Create(CRUDItem.value);
+    if (result === Errors.Unexpected) {
+      throw result;
+    }
+  }
+
   async function getItemsByCatalogue(): Promise<void> {
     page.value = 1;
     const result = await itemService.GetItemsByCatalogue(
@@ -78,12 +85,21 @@ export function useItem() {
     run: runWrappedGetItemsByCatalogue,
   } = createAsyncProcess(getItemsByCatalogue);
 
+  const {
+    active: loadingCreate,
+    run: runWrappedCreateItem,
+  } = createAsyncProcess(createItem);
+
   //watch(page, runWrappedGetItems);
 
   watch(itemFilter, runWrappedGetItemsByCatalogue);
 
   watch(loadingGet, () => {
     itemsLoading.value = loadingGet.value;
+  });
+
+  watch(loadingGet, () => {
+    itemsLoading.value = loadingCreate.value;
   });
 
   return {
@@ -96,5 +112,6 @@ export function useItem() {
     page,
     catalogueID,
     CRUDItem,
+    runWrappedCreateItem,
   };
 }

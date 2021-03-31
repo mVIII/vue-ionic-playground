@@ -165,6 +165,11 @@ Items.push(
 );
 
 export default class MockItemService implements ItemService {
+  async Create(item: Item): Promise<void | Errors.Unexpected> {
+    item.id = String(Items.length + 1);
+    Items.push(item);
+  }
+
   async GetItemsByCatalogue(
     catalogueID: string,
     filter: Filter,
@@ -178,7 +183,7 @@ export default class MockItemService implements ItemService {
       if (aggregation.type === AggregationType.eq) {
         const result = items.filter((item) => {
           return item.fields.some((field) =>
-            (aggregation.query as string[]).includes(field.value)
+            (aggregation.query as string[]).includes(field.value as string)
           );
         });
         items = result;
