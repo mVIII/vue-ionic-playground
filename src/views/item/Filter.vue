@@ -8,8 +8,8 @@
     </ion-toolbar>
   </ion-header>
   <ion-content :fullscreen="true">
-    <ion-list-header>Colors</ion-list-header>
     <div v-for="filterView in filterViews" :key="filterView.name">
+      <ion-list-header>{{ filterView.name }}}</ion-list-header>
       <!---ENUM TYPE--->
       <p v-if="filterView.type === 2">
         <ion-chip
@@ -26,7 +26,6 @@
         </ion-chip>
       </p>
     </div>
-    <p></p>
     <ion-list-header>Price</ion-list-header>
     <ion-range min="0" max="1000" pin color="secondary">
       <ion-label size="small" slot="start" name="sunny">0</ion-label>
@@ -203,6 +202,7 @@ export default {
           };
         })
         .map((aggregation) => {
+          //REMOVE DEFAULT
           switch (aggregation.field.type) {
             case FieldTypes.String:
               return (aggregation.query as string) === '' ? null : aggregation;
