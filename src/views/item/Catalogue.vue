@@ -12,11 +12,24 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-toolbar>
+      <ion-toolbar style="padding-top:10px;">
         <ion-searchbar
           @ionInput="filterDisplayedItems($event.target.value)"
         ></ion-searchbar>
       </ion-toolbar>
+      <div>
+        <ion-chip
+          v-for="sortingOption in sortingOptions"
+          :key="sortingOption.name"
+          @click="sortItems(sortingOption)"
+        >
+          <ion-label>{{ sortingOption.name }}</ion-label>
+          <ion-icon
+            v-if="activeSortingOption.name === sortingOption.name"
+            :icon="close"
+          ></ion-icon>
+        </ion-chip>
+      </div>
       <ion-list>
         <ion-list-header>
           {{ selectedCatalogue.name }}
@@ -42,9 +55,9 @@
       <ion-modal :is-open="addEditModalOpen">
         <ItemNewEdit
           @dismiss="setAddEditModalOpen(false)"
-          @save="applyFilter"
+          @save="runWrappedCreateItem() && setAddEditModalOpen(false)"
           :catalogue="selectedCatalogue"
-          :item="itemFilter"
+          :item="CRUDItem"
         ></ItemNewEdit>
       </ion-modal>
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
@@ -97,16 +110,17 @@ import {
   IonModal,
   IonIcon,
   IonButton,
+  IonChip,
 } from '@ionic/vue';
 
 import { useItem } from '@/composables/useItem';
 import { onMounted } from '@vue/runtime-core';
 import router from '@/router';
 import { useCatalogue } from '@/composables/useCatalogue';
-import { options } from 'ionicons/icons';
+import { options, close } from 'ionicons/icons';
 import ItemFilter from './Filter.vue';
 import { ref } from 'vue';
-import { Filter } from '@/services/dtos';
+import { Filter } from '@/services/dtos/';
 import ItemNewEdit from './NewEdit.vue';
 
 export default {
@@ -135,6 +149,8 @@ export default {
     IonIcon,
     IonButton,
     ItemNewEdit,
+    IonChip,
+    //IonPopover,
   },
   setup() {
     const {
@@ -147,6 +163,7 @@ export default {
       catalogueID,
       page,
       CRUDItem,
+      runWrappedCreateItem,
     } = useItem();
 
     const {
@@ -178,6 +195,40 @@ export default {
       setFilterModalOpen(false);
     };
 
+    enum filteringOptions {
+      sortNewstFirst,
+      sortOldestFirst,
+      sortAlphabetically,
+      none,
+    }
+
+    type sortingOption = {
+      name: string;
+      type: filteringOptions;
+      color?: string;
+    };
+
+    const activeSortingOption = ref<sortingOption>({
+      name: '',
+      type: filteringOptions.none,
+      color: 'primary',
+    });
+
+    const sortingOptions: sortingOption[] = [
+      {
+        name: 'Show newest first',
+        type: filteringOptions.sortNewstFirst,
+      },
+      {
+        name: 'Sort oldest first',
+        type: filteringOptions.sortAlphabetically,
+      },
+      {
+        name: 'Sort alphabetically',
+        type: filteringOptions.sortAlphabetically,
+      },
+    ];
+
     const clickedAdd = () => {
       CRUDItem.value = {
         id: '',
@@ -204,6 +255,12 @@ export default {
       addEditModalOpen,
       setAddEditModalOpen,
       clickedAdd,
+      CRUDItem,
+      runWrappedCreateItem,
+      close,
+      sortingOptions,
+      activeSortingOption,
+      //sortItems,
     };
   },
 };

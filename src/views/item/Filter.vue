@@ -9,7 +9,7 @@
   </ion-header>
   <ion-content :fullscreen="true">
     <div v-for="filterView in filterViews" :key="filterView.name">
-      <ion-list-header>{{ filterView.name }}}</ion-list-header>
+      <ion-list-header>{{ filterView.name }}</ion-list-header>
       <!---ENUM TYPE--->
       <p v-if="filterView.type === 2">
         <ion-chip
@@ -53,9 +53,10 @@ import {
 
 import { ref } from 'vue';
 import { close } from 'ionicons/icons';
-import { Aggregation, AggregationType, Filter } from '@/services/dtos';
+import { Aggregation, AggregationType, Filter } from '@/services/dtos/';
 import { PropType, SetupContext } from '@vue/runtime-core';
-import { Catalogue, FieldTypes } from '@/types';
+import { Catalogue, FieldTypes, FieldView } from '@/types';
+import { fieldViewsFromSchema } from '@/utils';
 export default {
   name: 'ItemsFilter',
   components: {
@@ -88,55 +89,17 @@ export default {
   ): Record<string, unknown> {
     //const filter: ItemFilter = ref<ItemFilter>({ catalogue: '' });
 
-    type filterView = {
-      name: string;
-      color: string;
-      type: FieldTypes;
-      value: string | boolean | number | string[];
-      enum?: string[];
-    };
-
     const selectedCatalogue = ref<Catalogue>(props.catalogue);
     const itemFilter = props.itemFilter as Filter;
-    const filterViews = ref<filterView[]>([]);
+    const filterViews = ref<FieldView[]>([]);
 
     const newFilter = ref<Filter>({ aggregations: [] });
 
     //TODO REFACTOR ASAP
     //ONE FILTER FOR EACH SCHEMA ITEM
-    filterViews.value = selectedCatalogue.value.ItemSchema.map((field) => {
-      switch (field.type) {
-        case FieldTypes.Number:
-          return {
-            name: field.name,
-            type: field.type,
-            color: field.name,
-            value: 0,
-          };
-        case FieldTypes.Boolean:
-          return {
-            name: field.name,
-            type: field.type,
-            color: field.name,
-            value: false,
-          };
-        case FieldTypes.Enum:
-          return {
-            name: field.name,
-            type: field.type,
-            color: field.name,
-            enum: field.enum,
-            value: [],
-          };
-        default:
-          return {
-            name: field.name,
-            type: field.type,
-            color: field.name,
-            value: '',
-          };
-      }
-    });
+    filterViews.value = fieldViewsFromSchema(
+      selectedCatalogue.value.ItemSchema
+    );
     //CHANGE DEFAULT FILTER VALUE TO MATCH THE ITEM FILTER
     itemFilter.aggregations.forEach((aggregation) => {
       const f = filterViews.value.find((field) => {

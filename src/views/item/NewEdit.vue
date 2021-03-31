@@ -7,44 +7,50 @@
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-
   <ion-content :fullscreen="true">
     <div class="container">
       <div class="item-avatar">
-        <img
-          class="item-image"
-          src="https://www.houseofwine.gr/how/media/catalog/product/cache/1/image/600x600/9df78eab33525d08d6e5fb8d27136e95/b/0/b0089_estrella_inedit.jpg"
-        />
+        <img class="item-image" :src="itemRef.image" />
         <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-          <ion-fab-button @click="setImageActionSheetOpen(true)">
+          <ion-fab-button @click="takePicture()">
             <ion-icon :icon="cameraOutline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
       </div>
     </div>
     <ion-list lines="full" class="ion-no-margin">
-      <ion-list-header lines="full">
-        <ion-label>
-          {{ title }}
-        </ion-label>
-      </ion-list-header>
       <ion-item>
         <ion-label>Name</ion-label>
-        <ion-input placeholder="Name"></ion-input>
+        <ion-input placeholder="Name" v-model="itemRef.name"></ion-input>
       </ion-item>
+      <div v-for="fieldView in fieldViews" :key="fieldView.name">
+        <ion-list-header>{{ fieldView.name }}</ion-list-header>
+        <!---ENUM TYPE--->
+        <p v-if="fieldView.type === 2">
+          <ion-chip
+            v-for="enumVal in fieldView.enum"
+            :key="enumVal"
+            :color="enumVal"
+            @click="toogleEnumValue(fieldView.name, enumVal)"
+          >
+            <ion-label>{{ enumVal }}</ion-label>
+            <ion-icon
+              v-if="fieldView.value === enumVal"
+              :icon="checkmark"
+            ></ion-icon>
+          </ion-chip>
+        </p>
+      </div>
       <ion-item>
         <ion-label position="stacked">Description</ion-label>
-        <ion-input placeholder="Description"></ion-input>
+        <ion-input
+          placeholder="Description"
+          v-model="itemRef.description"
+        ></ion-input>
       </ion-item>
     </ion-list>
-    <ion-button expand="block">Add</ion-button>
+    <ion-button expand="block" @click="save()">Add</ion-button>
   </ion-content>
-  <ion-action-sheet
-    :is-open="imageActionSheetOpen"
-    header="Avatar"
-    :buttons="imageActionSheet"
-  >
-  </ion-action-sheet>
 </template>
 
 <script lang="ts">
@@ -60,17 +66,18 @@ import {
   IonItem,
   IonLabel,
   IonButton,
-  IonActionSheet,
   IonIcon,
   IonFab,
+  IonFabButton,
+  IonChip,
 } from '@ionic/vue';
-import { cameraOutline } from 'ionicons/icons';
-import { Catalogue, Item } from '@/types';
-import { PropType } from '@vue/runtime-core';
+import { cameraOutline, checkmark } from 'ionicons/icons';
+import { Catalogue, Item, FieldView } from '@/types';
+import { PropType, SetupContext } from '@vue/runtime-core';
 import { ref } from 'vue';
 import { Plugins, CameraResultType, CameraSource } from '@capacitor/core';
-const { Camera } = Plugins;
-
+const { Camera /*Motion*/ } = Plugins;
+import { fieldViewsFromSchema } from '@/utils';
 export default {
   name: 'ItemNewEdit',
   components: {
@@ -85,9 +92,10 @@ export default {
     IonItem,
     IonLabel,
     IonButton,
-    IonActionSheet,
     IonIcon,
     IonFab,
+    IonFabButton,
+    IonChip,
   },
   emits: ['dismiss', 'save'],
   props: {
@@ -100,23 +108,20 @@ export default {
       default: { id: '', catalogue: '', name: '', fields: [] },
     },
   },
-  setup(props: any): Record<string, unknown> {
-    const title = props.item.name === '' ? 'New Item' : props.item.name;
+  setup(
+    props: any,
+    context: SetupContext<('dismiss' | 'save')[]>
+  ): Record<string, unknown> {
+    console.log(props.item.name);
+    const title =
+      props.item.name === '' ? 'New ' + props.catalogue.name : props.item.name;
 
     const itemRef = ref<Item>(props.item);
+    const catalogue = ref<Catalogue>(props.catalogue);
 
-    const addImageIcon = '';
-
-    const imageActionSheetOpen = ref(false);
-    const setImageActionSheetOpen = (state: boolean) =>
-      (imageActionSheetOpen.value = state);
-
-    type Button = {
-      text: string;
-      role?: string;
-      icon?: string;
-      handler: Function;
-    };
+    const fieldViews = ref<FieldView[]>(
+      fieldViewsFromSchema(catalogue.value.ItemSchema)
+    );
 
     const takePicture = async () => {
       const image = await Camera.getPhoto({
@@ -132,38 +137,38 @@ export default {
       }
     };
 
-    const imageActionSheet: Button[] = [
-      {
-        text: 'Camera',
-        handler: async () => {
-          await takePicture();
-          console.log('succ');
-          setImageActionSheetOpen(false);
-        },
-      },
-      {
-        text: 'From files',
-        handler: () => {
-          setImageActionSheetOpen(false);
-          console.log('from files');
-        },
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel',
-        handler: () => {
-          setImageActionSheetOpen(false);
-        },
-      },
-    ];
+    const toogleEnumValue = (name: string, val: string) => {
+      const fview = fieldViews.value.find((fieldView) => {
+        return fieldView.name === name;
+      });
+      if (!fview) {
+        console.log('NotFound');
+        return;
+      }
+      fview.value = val;
+    };
+
+    const save = () => {
+      itemRef.value.catalogue = catalogue.value.id;
+      fieldViews.value.forEach((field) => {
+        itemRef.value.fields.push({
+          name: field.name,
+          type: field.type,
+          value: field.value,
+        });
+      });
+      context.emit('save', itemRef.value);
+    };
 
     return {
       cameraOutline,
       itemRef,
       title,
-      imageActionSheet,
-      imageActionSheetOpen,
-      setImageActionSheetOpen,
+      takePicture,
+      toogleEnumValue,
+      fieldViews,
+      checkmark,
+      save,
     };
   },
 };
@@ -174,6 +179,8 @@ export default {
   border-radius: 100px;
   max-width: 135px;
   max-height: 135px;
+  min-width: 135px;
+  min-height: 135px;
   margin: 5px;
 }
 .item-avatar {
