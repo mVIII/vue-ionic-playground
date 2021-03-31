@@ -1,7 +1,7 @@
 import { CatalogueService } from '@/services/Catalogue';
 import { Errors } from '@/services/dtos';
 import { Catalogue, Item } from '@/types';
-import createAsyncProcess from '@/utils/create-async-process';
+import { createAsyncProcess } from '@/utils';
 import { container } from 'tsyringe';
 import { ref, watch } from 'vue';
 

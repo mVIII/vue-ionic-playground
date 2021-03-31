@@ -7,7 +7,7 @@ interface CreateAsyncProcessReturn<T extends (...args: any[]) => any> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function createAsyncProcess<T extends (...args: any[]) => any>(
+function createAsyncProcess<T extends (...args: any[]) => any>(
   fn: T
 ): CreateAsyncProcessReturn<T> {
   const active: CreateAsyncProcessReturn<T>['active'] = ref(false);
@@ -21,3 +21,5 @@ export default function createAsyncProcess<T extends (...args: any[]) => any>(
 
   return { active, run };
 }
+
+export { createAsyncProcess };
