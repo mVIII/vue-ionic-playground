@@ -1,4 +1,11 @@
-import { AggregationType, Errors, Filter, ItemPage } from '../dtos';
+import {
+  AggregationType,
+  Errors,
+  Filter,
+  ItemPage,
+  SortingFilter,
+  SortingType,
+} from '../dtos';
 import { ItemService } from '../Item';
 import { FieldTypes, Item } from '@/types';
 
@@ -174,7 +181,8 @@ export default class MockItemService implements ItemService {
     catalogueID: string,
     filter: Filter,
     page: number,
-    max = 5
+    max = 5,
+    sortBy?: SortingFilter
   ): Promise<ItemPage | Errors.Unexpected> {
     let items: Item[] = Items.filter((item) => {
       return item.catalogue === catalogueID;
@@ -191,6 +199,14 @@ export default class MockItemService implements ItemService {
         items = [];
       }
     });
+
+    if (sortBy) {
+      switch (sortBy.type) {
+        case SortingType.sortAlphabetically:
+          items = items.sort();
+          break;
+      }
+    }
 
     const pageResult = items.filter((item, index) => {
       return index >= (page - 1) * max && index < page * max;

@@ -14,18 +14,18 @@
     <ion-content :fullscreen="true">
       <ion-toolbar style="padding-top:10px;">
         <ion-searchbar
-          @ionInput="filterDisplayedItems($event.target.value)"
+          @ionInput="queryDisplayedItems($event.target.value)"
         ></ion-searchbar>
       </ion-toolbar>
       <div>
         <ion-chip
           v-for="sortingOption in sortingOptions"
           :key="sortingOption.name"
-          @click="sortItems(sortingOption)"
+          @click="toggleSortingOption(sortingOption)"
         >
           <ion-label>{{ sortingOption.name }}</ion-label>
           <ion-icon
-            v-if="activeSortingOption.name === sortingOption.name"
+            v-if="sortingFilter.name === sortingOption.name"
             :icon="close"
           ></ion-icon>
         </ion-chip>
@@ -60,6 +60,7 @@
           :item="CRUDItem"
         ></ItemNewEdit>
       </ion-modal>
+      
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button @click="setFilterModalOpen(true)">
           <ion-icon :icon="options"></ion-icon>
@@ -120,7 +121,7 @@ import { useCatalogue } from '@/composables/useCatalogue';
 import { options, close } from 'ionicons/icons';
 import ItemFilter from './Filter.vue';
 import { ref } from 'vue';
-import { Filter } from '@/services/dtos/';
+import { Filter, SortingFilter, SortingType } from '@/services/dtos/';
 import ItemNewEdit from './NewEdit.vue';
 
 export default {
@@ -155,10 +156,11 @@ export default {
   setup() {
     const {
       runWrappedGetItemsByCatalogue,
-      filterDisplayedItems,
+      queryDisplayedItems,
       itemsLoading,
       displayedItems,
       itemFilter,
+      sortingFilter,
       infiteLoadCatalogueItems,
       catalogueID,
       page,
@@ -190,42 +192,34 @@ export default {
     const setAddEditModalOpen = (state: boolean) =>
       (addEditModalOpen.value = state);
 
-    const applyFilter = async (newItemFilter: Filter) => {
+    const applyFilter = (newItemFilter: Filter) => {
       itemFilter.value = newItemFilter;
       setFilterModalOpen(false);
     };
 
-    enum filteringOptions {
-      sortNewstFirst,
-      sortOldestFirst,
-      sortAlphabetically,
-      none,
-    }
-
-    type sortingOption = {
-      name: string;
-      type: filteringOptions;
-      color?: string;
+    const toggleSortingOption = (sortingOption: SortingFilter) => {
+      if (sortingFilter.value.name === sortingOption.name) {
+        sortingFilter.value = {
+          name: '',
+          type: SortingType.none,
+        };
+      } else {
+        sortingFilter.value = sortingOption;
+      }
     };
 
-    const activeSortingOption = ref<sortingOption>({
-      name: '',
-      type: filteringOptions.none,
-      color: 'primary',
-    });
-
-    const sortingOptions: sortingOption[] = [
+    const sortingOptions: SortingFilter[] = [
       {
         name: 'Show newest first',
-        type: filteringOptions.sortNewstFirst,
+        type: SortingType.sortNewstFirst,
       },
       {
         name: 'Sort oldest first',
-        type: filteringOptions.sortAlphabetically,
+        type: SortingType.sortAlphabetically,
       },
       {
         name: 'Sort alphabetically',
-        type: filteringOptions.sortAlphabetically,
+        type: SortingType.sortAlphabetically,
       },
     ];
 
@@ -243,7 +237,7 @@ export default {
       selectedCatalogue,
       catalogueLoading,
       itemsLoading,
-      filterDisplayedItems,
+      queryDisplayedItems,
       displayedItems,
       infiteLoadCatalogueItems,
       filterModalOpen,
@@ -259,8 +253,8 @@ export default {
       runWrappedCreateItem,
       close,
       sortingOptions,
-      activeSortingOption,
-      //sortItems,
+      sortingFilter,
+      toggleSortingOption,
     };
   },
 };

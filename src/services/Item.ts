@@ -1,4 +1,4 @@
-import { Errors, ItemPage, Filter } from './dtos';
+import { Errors, ItemPage, Filter, SortingFilter } from './dtos';
 import { Item } from '@/types';
 
 export interface ItemService {
@@ -7,6 +7,7 @@ export interface ItemService {
     catalogueID: string,
     filter: Filter,
     page: number,
-    max?: number
+    max?: number,
+    sortBy?: SortingFilter
   ): Promise<ItemPage | Errors.Unexpected>;
 }

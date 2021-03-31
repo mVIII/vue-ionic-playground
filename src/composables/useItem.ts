@@ -1,7 +1,7 @@
-import { Errors, Filter } from '@/services/dtos';
+import { Errors, Filter, SortingFilter, SortingType } from '@/services/dtos';
 import { ItemService } from '@/services/Item';
 import { Item } from '@/types';
-import {createAsyncProcess} from '@/utils';
+import { createAsyncProcess } from '@/utils';
 import { container } from 'tsyringe';
 import { ref, watch } from 'vue';
 
@@ -13,6 +13,12 @@ export function useItem() {
   const itemFilter = ref<Filter>({
     aggregations: [],
   });
+
+  const sortingFilter = ref<SortingFilter>({
+    name: '',
+    type: SortingType.none,
+  });
+
   const catalogueID = ref<string>('');
 
   const itemService = container.resolve<ItemService>('Item');
@@ -37,7 +43,8 @@ export function useItem() {
       catalogueID.value,
       itemFilter.value,
       page.value,
-      20
+      20,
+      sortingFilter.value
     );
 
     if (result === Errors.Unexpected) {
@@ -45,7 +52,6 @@ export function useItem() {
     }
     items.value = result.items;
     displayedItems.value = result.items;
-    console.log(displayedItems.value);
     totalPages.value = result.pagination.pages;
   }
 
@@ -68,7 +74,7 @@ export function useItem() {
     ev.target.complete();
   }
 
-  function filterDisplayedItems(query: string) {
+  function queryDisplayedItems(query: string) {
     const itemsToDisplay = items.value
       .map((item) =>
         item.name.toLowerCase().indexOf(query.toLocaleLowerCase()) > -1
@@ -94,11 +100,13 @@ export function useItem() {
 
   watch(itemFilter, runWrappedGetItemsByCatalogue);
 
+  watch(sortingFilter, runWrappedGetItemsByCatalogue);
+
   watch(loadingGet, () => {
     itemsLoading.value = loadingGet.value;
   });
 
-  watch(loadingGet, () => {
+  watch(loadingCreate, () => {
     itemsLoading.value = loadingCreate.value;
   });
 
@@ -106,9 +114,10 @@ export function useItem() {
     itemsLoading,
     runWrappedGetItemsByCatalogue,
     infiteLoadCatalogueItems,
-    filterDisplayedItems,
+    queryDisplayedItems,
     displayedItems,
     itemFilter,
+    sortingFilter,
     page,
     catalogueID,
     CRUDItem,
