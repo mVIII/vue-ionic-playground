@@ -93,8 +93,6 @@ export default {
     const itemFilter = props.itemFilter as Filter;
     const filterViews = ref<FieldView[]>([]);
 
-    const newFilter = ref<Filter>({ aggregations: [] });
-
     //TODO REFACTOR ASAP
     //ONE FILTER FOR EACH SCHEMA ITEM
     filterViews.value = fieldViewsFromSchema(
@@ -181,7 +179,6 @@ export default {
       const newItemFilter: Filter = {
         aggregations: aggregations,
       };
-      console.log(newItemFilter);
       context.emit('apply', newItemFilter);
     };
 
