@@ -30,7 +30,13 @@ const catalogues: Catalogue[] = [
         return item.catalogue === '1';
       }).length;
     })(),
-    ItemSchema: [],
+    ItemSchema: [{
+      id: '0',
+      name: 'Size',
+      type: FieldTypes.Enum,
+      enum: ['small', 'medium', 'big'],
+      required: true,
+    }],
   },
   {
     id: '2',

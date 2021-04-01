@@ -4,7 +4,7 @@
     <ion-menu side="start" menu-id="first" class="ion-menu" content-id="main">
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-title>Start Menu</ion-title>
+          <ion-title>NORMA</ion-title>
         </ion-toolbar>
       </ion-header>
       <ion-content>

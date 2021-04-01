@@ -15,7 +15,7 @@
         <ion-chip
           v-for="enumVal in filterView.enum"
           :key="enumVal"
-          :color="enumVal"
+          :color="['red','rose','white'][Math.floor(Math.random()*3)]"
           @click="toogleEnumValue(filterView.name, enumVal)"
         >
           <ion-label>{{ enumVal }}</ion-label>

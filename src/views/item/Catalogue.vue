@@ -32,15 +32,28 @@
             </ion-row>
             <ion-row>
               <ion-col>
-                <ion-card color="secondary"
-                  ><ion-card-header>Wine</ion-card-header></ion-card
+                <ion-card><ion-card-header>Meat</ion-card-header></ion-card>
+              </ion-col>
+              <ion-col>
+                <ion-card color="primary"
+                  ><ion-card-header>Seafood</ion-card-header></ion-card
                 >
               </ion-col>
               <ion-col>
-                <ion-card><ion-card-header>Whiskey</ion-card-header></ion-card>
+                <ion-card><ion-card-header>Vegetables</ion-card-header></ion-card>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-card color="secondary"
+                  ><ion-card-header>Fish</ion-card-header></ion-card
+                >
               </ion-col>
               <ion-col>
-                <ion-card><ion-card-header>Vodka</ion-card-header></ion-card>
+                <ion-card><ion-card-header>Sharks</ion-card-header></ion-card>
+              </ion-col>
+              <ion-col>
+                <ion-card><ion-card-header>Clams</ion-card-header></ion-card>
               </ion-col>
             </ion-row>
             <div>
@@ -188,7 +201,7 @@ import {
 } from "@ionic/vue";
 
 import { useItem } from "@/composables/useItem";
-import { onMounted } from "@vue/runtime-core";
+import { onMounted, onUpdated } from "@vue/runtime-core";
 import router from "@/router";
 import { useCatalogue } from "@/composables/useCatalogue";
 import { options, close } from "ionicons/icons";
@@ -255,9 +268,10 @@ export default {
       selectedCatalogue,
     } = useCatalogue();
 
-    onMounted(async () => {
+    onUpdated(async () => {
       try {
         const catalogueId = router.currentRoute.value.params.id as string;
+        console.log(catalogueId)
         await runWrappedGetCatalogue(catalogueId);
         catalogueID.value = catalogueId;
         await runWrappedGetItemsByCatalogue();
