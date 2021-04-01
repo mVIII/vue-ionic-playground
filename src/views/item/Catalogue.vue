@@ -12,56 +12,89 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-toolbar style="padding-top:10px;">
-        <ion-searchbar
-          @ionInput="queryDisplayedItems($event.target.value)"
-        ></ion-searchbar>
+      <ion-toolbar style="padding-top: 10px">
+        <div slot="end">
+          <ion-button slot="end" fill="solid">+ Ingredient</ion-button>
+          <ion-button slot="end" fill="solid">+ Category</ion-button>
+        </div>
       </ion-toolbar>
-      <div>
-        <ion-chip
-          v-for="sortingOption in sortingOptions"
-          :key="sortingOption.name"
-          @click="toggleSortingOption(sortingOption)"
-        >
-          <ion-label>{{ sortingOption.name }}</ion-label>
-          <ion-icon
-            v-if="sortingFilter.name === sortingOption.name"
-            :icon="close"
-          ></ion-icon>
-        </ion-chip>
-      </div>
       <ion-grid>
         <ion-row>
-        <ion-col>
-      <ion-list>
-        <ion-grid>
-          <ion-col>
-        <ion-list-header>
-          {{ selectedCatalogue.name }}
-        </ion-list-header>
-        <ion-row>
-        <ion-item v-for="item in displayedItems" :key="item.name">
-          <ion-avatar slot="start">
-            <img :src="item.image" />
-          </ion-avatar>
-          <ion-label
-            ><h2>{{ item.name }}</h2>
-            <p>{{ item.description }}</p></ion-label
-          >
-        </ion-item>
+          <ion-col v-for="item in items" :key="item.name">
+            <apexchart
+              height="200"
+              width="200"
+              :options="item.chartOptions"
+              :series="item.series"
+            ></apexchart>
+          </ion-col>
         </ion-row>
-        </ion-col>
-        </ion-grid>
-      </ion-list>
-        </ion-col>
-        <ion-col size="3">
-        <ItemFilter
-          :catalogue="selectedCatalogue"
-          :itemFilter="itemFilter"
-        ></ItemFilter>
-        </ion-col>
+        <ion-row>
+          <ion-col>
+            <ion-row>
+              <ion-col>
+                <ion-card color="success"
+                  ><ion-card-header>Wine</ion-card-header></ion-card
+                >
+              </ion-col>
+              <ion-col>
+                <ion-card><ion-card-header>Whiskey</ion-card-header></ion-card>
+              </ion-col>
+              <ion-col>
+                <ion-card><ion-card-header>Vodka</ion-card-header></ion-card>
+              </ion-col>
+            </ion-row>
+            <div>
+              <ion-chip
+                v-for="sortingOption in sortingOptions"
+                :key="sortingOption.name"
+                @click="toggleSortingOption(sortingOption)"
+              >
+                <ion-label>{{ sortingOption.name }}</ion-label>
+                <ion-icon
+                  v-if="sortingFilter.name === sortingOption.name"
+                  :icon="close"
+                ></ion-icon>
+              </ion-chip>
+            </div>
+
+            <ion-item-divider />
+            <ion-row>
+              <ion-grid>
+                <ion-col>
+                  <ion-row>
+                    <ion-card v-for="item in displayedItems" :key="item.name">
+                      <ion-card-content>
+                        <ion-avatar slot="start">
+                          <img :src="item.image" />
+                        </ion-avatar>
+                        <h2>
+                          <strong>{{ item.name }}</strong>
+                        </h2>
+
+                        <p>7 days left</p>
+                        <p>10 bottles left</p>
+                      </ion-card-content>
+                    </ion-card>
+                  </ion-row>
+                </ion-col>
+              </ion-grid>
+            </ion-row>
+          </ion-col>
+          <ion-col size="2" class="ion-hide-md-down">
+            <ion-searchbar
+              @ionInput="queryDisplayedItems($event.target.value)"
+            ></ion-searchbar>
+            <ItemFilter
+              v-if="!catalogueLoading"
+              @apply="applyFilter"
+              :catalogue="selectedCatalogue"
+              :itemFilter="itemFilter"
+            ></ItemFilter>
+          </ion-col>
         </ion-row>
       </ion-grid>
+
       <ion-modal :is-open="filterModalOpen">
         <ItemFilter
           @dismiss="setFilterModalOpen(false)"
@@ -107,7 +140,10 @@
 </template>
 
 <script lang="ts">
+import { ApexOptions } from 'apexcharts';
+import VueApexCharts from 'vue3-apexcharts';
 import {
+  IonItemDivider,
   IonPage,
   IonList,
   IonSearchbar,
@@ -119,6 +155,8 @@ import {
   IonButtons,
   IonTitle,
   IonListHeader,
+  IonCardContent,
+  IonCardHeader,
   IonBackButton,
   IonLoading,
   IonInfiniteScroll,
@@ -132,33 +170,39 @@ import {
   IonChip,
   IonGrid,
   IonRow,
-  IonCol
-} from '@ionic/vue';
+  IonCol,
+  IonCard,
+} from "@ionic/vue";
 
-import { useItem } from '@/composables/useItem';
-import { onMounted } from '@vue/runtime-core';
-import router from '@/router';
-import { useCatalogue } from '@/composables/useCatalogue';
-import { options, close } from 'ionicons/icons';
-import ItemFilter from './Filter.vue';
-import { ref } from 'vue';
-import { Filter, SortingFilter, SortingType } from '@/services/dtos/';
-import ItemNewEdit from './NewEdit.vue';
+import { useItem } from "@/composables/useItem";
+import { onMounted } from "@vue/runtime-core";
+import router from "@/router";
+import { useCatalogue } from "@/composables/useCatalogue";
+import { options, close } from "ionicons/icons";
+import ItemFilter from "./Filter.vue";
+import { ref } from "vue";
+import { Filter, SortingFilter, SortingType } from "@/services/dtos/";
+import ItemNewEdit from "./NewEdit.vue";
 
 export default {
-  name: 'Catalogue',
+  name: "Catalogue",
   components: {
+    apexchart: VueApexCharts,
+    IonItemDivider,
     IonButtons,
     IonTitle,
     IonSearchbar,
     IonLabel,
     IonHeader,
     IonToolbar,
-    IonItem,
-    IonList,
+    // IonItem,
+    IonCard,
+    IonCardHeader,
+    IonCardContent,
+    // IonList,
     IonContent,
     IonPage,
-    IonListHeader,
+    // IonListHeader,
     IonLoading,
     IonBackButton,
     IonInfiniteScroll,
@@ -224,7 +268,7 @@ export default {
     const toggleSortingOption = (sortingOption: SortingFilter) => {
       if (sortingFilter.value.name === sortingOption.name) {
         sortingFilter.value = {
-          name: '',
+          name: "",
           type: SortingType.none,
         };
       } else {
@@ -234,30 +278,105 @@ export default {
 
     const sortingOptions: SortingFilter[] = [
       {
-        name: 'Show newest first',
+        name: "Show newest first",
         type: SortingType.sortNewstFirst,
       },
       {
-        name: 'Sort oldest first',
+        name: "Sort oldest first",
         type: SortingType.sortAlphabetically,
       },
       {
-        name: 'Sort alphabetically',
+        name: "Sort alphabetically",
         type: SortingType.sortAlphabetically,
       },
     ];
 
     const clickedAdd = () => {
       CRUDItem.value = {
-        id: '',
-        catalogue: '',
-        name: '',
+        id: "",
+        catalogue: "",
+        name: "",
         fields: [],
       };
       setAddEditModalOpen(true);
     };
 
+    const seriesRadar = [
+      {
+        name: 'Series 1',
+        data: [80, 50, 30, 40, 100],
+      },
+    ];
+
+    const seriesPie = [44, 55, 13, 43, 22];
+
+    const items: {
+      name: string;
+      chartOptions: ApexOptions;
+      series: { name: string; data: number[] }[] | number[];
+    }[] = [
+      {
+        name: 'Add new item',
+        chartOptions: {
+          chart: {
+            height: 350,
+            width: 500,
+            type: 'radar',
+          },
+          title: {
+            text: 'Client preferences',
+          },
+          xaxis: {
+            categories: ['Fish', 'Meat', 'Salad', 'Fruit', 'Wine'],
+          },
+          markers: {
+            size: 6,
+          },
+        },
+        series: seriesRadar,
+      },
+      {
+        name: 'Pie chart',
+        chartOptions: {
+          title: {
+            text: 'Stock',
+          },
+          chart: {
+            width: '100',
+            type: 'pie',
+          },
+          labels: ['Meat', 'Fish', 'Salad', 'Fruit', 'Wine'],
+        },
+        series: seriesPie,
+      },
+      {
+        name: 'Line chart',
+        chartOptions: {
+          title: {
+            text: 'Sales',
+          },
+          chart: {
+            height: 100,
+            type: 'line',
+            zoom: {
+              enabled: false,
+            },
+          },
+          grid: {
+            row: {
+              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+              opacity: 0.5,
+            },
+          },
+        },
+        series: [
+          { name: 'series 2', data: [10, 41, 35, 51, 49, 62, 69, 91, 148] },
+        ],
+      },
+    ];
+
     return {
+      items,
       selectedCatalogue,
       catalogueLoading,
       itemsLoading,
