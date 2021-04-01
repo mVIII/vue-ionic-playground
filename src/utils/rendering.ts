@@ -8,6 +8,7 @@ function fieldViewsFromSchema(schemaFields: schemaField[]): FieldView[] {
       name: field.name,
       type: field.type,
       color: field.name,
+      required: field.required,
       value: '',
     };
     switch (field.type) {

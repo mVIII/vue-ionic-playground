@@ -14,9 +14,11 @@ const catalogues: Catalogue[] = [
     })(),
     ItemSchema: [
       {
+        id: '0',
         name: 'Color',
         type: FieldTypes.Enum,
         enum: ['red', 'rose', 'white'],
+        required: true,
       },
     ],
   },

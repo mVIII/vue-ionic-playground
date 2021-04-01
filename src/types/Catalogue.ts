@@ -1,9 +1,11 @@
 import { FieldTypes } from './Item';
 
 export type schemaField = {
+  id: string;
   name: string;
   type: FieldTypes;
   enum?: string[];
+  required: boolean;
 };
 
 export type Catalogue = {

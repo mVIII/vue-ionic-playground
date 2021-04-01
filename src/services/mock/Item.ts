@@ -78,6 +78,7 @@ const makeWines = (
         {
           name: 'color',
           type: FieldTypes.Enum,
+          required: true,
           value: colors[Math.floor(Math.random() * colors.length)],
         },
       ],

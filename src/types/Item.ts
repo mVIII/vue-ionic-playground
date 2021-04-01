@@ -8,6 +8,7 @@ export enum FieldTypes {
 export type ItemField = {
   name: string;
   type: FieldTypes;
+  required: boolean;
   value: string | number | boolean | string[];
 };
 
