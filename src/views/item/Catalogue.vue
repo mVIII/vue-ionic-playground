@@ -30,10 +30,16 @@
           ></ion-icon>
         </ion-chip>
       </div>
+      <ion-grid>
+        <ion-row>
+        <ion-col>
       <ion-list>
+        <ion-grid>
+          <ion-col>
         <ion-list-header>
           {{ selectedCatalogue.name }}
         </ion-list-header>
+        <ion-row>
         <ion-item v-for="item in displayedItems" :key="item.name">
           <ion-avatar slot="start">
             <img :src="item.image" />
@@ -43,7 +49,19 @@
             <p>{{ item.description }}</p></ion-label
           >
         </ion-item>
+        </ion-row>
+        </ion-col>
+        </ion-grid>
       </ion-list>
+        </ion-col>
+        <ion-col size="3">
+        <ItemFilter
+          :catalogue="selectedCatalogue"
+          :itemFilter="itemFilter"
+        ></ItemFilter>
+        </ion-col>
+        </ion-row>
+      </ion-grid>
       <ion-modal :is-open="filterModalOpen">
         <ItemFilter
           @dismiss="setFilterModalOpen(false)"
@@ -60,7 +78,7 @@
           :item="CRUDItem"
         ></ItemNewEdit>
       </ion-modal>
-      
+
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button @click="setFilterModalOpen(true)">
           <ion-icon :icon="options"></ion-icon>
@@ -112,6 +130,9 @@ import {
   IonIcon,
   IonButton,
   IonChip,
+  IonGrid,
+  IonRow,
+  IonCol
 } from '@ionic/vue';
 
 import { useItem } from '@/composables/useItem';
@@ -151,6 +172,9 @@ export default {
     IonButton,
     ItemNewEdit,
     IonChip,
+    IonGrid,
+    IonRow,
+    IonCol,
     //IonPopover,
   },
   setup() {
