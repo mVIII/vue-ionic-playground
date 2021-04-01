@@ -155,6 +155,7 @@ export default {
           name: field.name,
           type: field.type,
           value: field.value,
+          required: field.required,
         });
       });
       context.emit('save', itemRef.value);
