@@ -12,28 +12,27 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-toolbar style="padding-top: 10px">
+      <ion-toolbar style="padding-top: 10px" slot="fixed">
         <div slot="end">
           <ion-button slot="end" fill="solid">+ Ingredient</ion-button>
           <ion-button slot="end" fill="solid">+ Category</ion-button>
         </div>
       </ion-toolbar>
-      <ion-grid>
-        <ion-row>
-          <ion-col v-for="item in items" :key="item.name">
-            <apexchart
-              height="200"
-              width="200"
-              :options="item.chartOptions"
-              :series="item.series"
-            ></apexchart>
-          </ion-col>
-        </ion-row>
+      <ion-grid style="margin-top: 60px">
         <ion-row>
           <ion-col>
+            <ion-row class="ion-align-items-left">
+              <ion-col v-for="item in items" :key="item.name">
+                <apexchart
+                  height="200"
+                  :options="item.chartOptions"
+                  :series="item.series"
+                ></apexchart>
+              </ion-col>
+            </ion-row>
             <ion-row>
               <ion-col>
-                <ion-card color="success"
+                <ion-card color="secondary"
                   ><ion-card-header>Wine</ion-card-header></ion-card
                 >
               </ion-col>
@@ -63,17 +62,24 @@
               <ion-grid>
                 <ion-col>
                   <ion-row>
-                    <ion-card v-for="item in displayedItems" :key="item.name">
+                    <ion-card
+                      v-for="item in displayedItems"
+                      :key="item.name"
+                      :color="randomColor()"
+                    >
                       <ion-card-content>
-                        <ion-avatar slot="start">
-                          <img :src="item.image" />
-                        </ion-avatar>
-                        <h2>
-                          <strong>{{ item.name }}</strong>
-                        </h2>
-
-                        <p>7 days left</p>
-                        <p>10 bottles left</p>
+                        <div
+                          style="display: flex; justify-content: space-evenly"
+                        >
+                          <ion-avatar slot="start">
+                            <img :src="item.image" />
+                          </ion-avatar>
+                        </div>
+                        <strong>{{ item.name }}</strong
+                        ><br />
+                        7 days left<br />
+                        10 bottles left<br />
+                        ~201.00€<br />
                       </ion-card-content>
                     </ion-card>
                   </ion-row>
@@ -81,10 +87,12 @@
               </ion-grid>
             </ion-row>
           </ion-col>
-          <ion-col size="2" class="ion-hide-md-down">
-            <ion-searchbar
-              @ionInput="queryDisplayedItems($event.target.value)"
-            ></ion-searchbar>
+          <ion-col size="2" style="margin-top: 400px" class="ion-hide-md-down">
+            <ion-toolbar>
+              <ion-searchbar
+                @ionInput="queryDisplayedItems($event.target.value)"
+              ></ion-searchbar>
+            </ion-toolbar>
             <ItemFilter
               v-if="!catalogueLoading"
               @apply="applyFilter"
@@ -112,7 +120,12 @@
         ></ItemNewEdit>
       </ion-modal>
 
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab
+        class="ion-hide-md-up"
+        vertical="bottom"
+        horizontal="end"
+        slot="fixed"
+      >
         <ion-fab-button @click="setFilterModalOpen(true)">
           <ion-icon :icon="options"></ion-icon>
         </ion-fab-button>
@@ -140,8 +153,8 @@
 </template>
 
 <script lang="ts">
-import { ApexOptions } from 'apexcharts';
-import VueApexCharts from 'vue3-apexcharts';
+import { ApexOptions } from "apexcharts";
+import VueApexCharts from "vue3-apexcharts";
 import {
   IonItemDivider,
   IonPage,
@@ -303,7 +316,7 @@ export default {
 
     const seriesRadar = [
       {
-        name: 'Series 1',
+        name: "Series 1",
         data: [80, 50, 30, 40, 100],
       },
     ];
@@ -316,18 +329,16 @@ export default {
       series: { name: string; data: number[] }[] | number[];
     }[] = [
       {
-        name: 'Add new item',
+        name: "Add new item",
         chartOptions: {
           chart: {
-            height: 350,
-            width: 500,
-            type: 'radar',
+            type: "radar",
           },
           title: {
-            text: 'Client preferences',
+            text: "Client preferences",
           },
           xaxis: {
-            categories: ['Fish', 'Meat', 'Salad', 'Fruit', 'Wine'],
+            categories: ["Fish", "Meat", "Salad", "Fruit", "Wine"],
           },
           markers: {
             size: 6,
@@ -336,46 +347,50 @@ export default {
         series: seriesRadar,
       },
       {
-        name: 'Pie chart',
+        name: "Pie chart",
         chartOptions: {
           title: {
-            text: 'Stock',
+            text: "Stock",
           },
           chart: {
-            width: '100',
-            type: 'pie',
+            type: "pie",
           },
-          labels: ['Meat', 'Fish', 'Salad', 'Fruit', 'Wine'],
+          labels: ["Meat", "Fish", "Salad", "Fruit", "Wine"],
         },
         series: seriesPie,
       },
       {
-        name: 'Line chart',
+        name: "Line chart",
         chartOptions: {
           title: {
-            text: 'Sales',
+            text: "Sales",
           },
           chart: {
-            height: 100,
-            type: 'line',
+            type: "line",
             zoom: {
               enabled: false,
             },
           },
           grid: {
             row: {
-              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+              colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
               opacity: 0.5,
             },
           },
         },
         series: [
-          { name: 'series 2', data: [10, 41, 35, 51, 49, 62, 69, 91, 148] },
+          { name: "series 2", data: [10, 41, 35, 51, 49, 62, 69, 91, 148] },
         ],
       },
     ];
 
+    function randomColor() {
+      const colors = ["warning", "danger", "light"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
     return {
+      randomColor,
       items,
       selectedCatalogue,
       catalogueLoading,
