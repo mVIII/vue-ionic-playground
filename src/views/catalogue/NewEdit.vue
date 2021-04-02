@@ -6,8 +6,19 @@
         <ion-button @click="$emit('dismiss')">Close</ion-button>
       </ion-buttons>
     </ion-toolbar>
+    <ion-toolbar>
+      <ion-segment v-model="segment">
+        <ion-segment-button value="options">
+          <ion-label>Options</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="fields">
+          <ion-label>Fields</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
   </ion-header>
-  <ion-content :fullscreen="true">
+  <!---OPTIONS--->
+  <ion-content :fullscreen="true" v-if="segment === 'options'">
     <ion-list lines="full" class="ion-no-margin">
       <ion-list-header lines="full">
         <ion-label>
@@ -25,72 +36,15 @@
           v-model="c.description"
         ></ion-input>
       </ion-item>
-      <ion-toolbar>
-        <ion-list-header>
-          Fields
-          <ion-fab>
-            <ion-fab-button @click="clickedAddField()">
-              <ion-icon :icon="add"></ion-icon>
-            </ion-fab-button>
-          </ion-fab>
-        </ion-list-header>
-      </ion-toolbar>
-      <ion-item v-for="field in c.ItemSchema" :key="field.id">
-        <ion-list>
-          <ion-toolbar>
-            <ion-list-header>
-              {{ field.name }}
-            </ion-list-header>
-            <ion-buttons slot="end">
-              <ion-button @click="clickedOptions(catalogue)">
-                <ion-icon
-                  :icon="ellipsisVertical"
-                  :ios="ellipsisHorizontal"
-                  :md="ellipsisVertical"
-                />
-              </ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-          <ion-item>
-            <ion-label>Name</ion-label>
-            <ion-input
-              placeholder="Field name"
-              v-model="field.name"
-              slot="end"
-            ></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label>Type</ion-label>
-            <ion-select interface="popover" v-model="field.type" slot="end">
-              <ion-select-option value="0">Alpharithemtic</ion-select-option>
-              <ion-select-option value="1">Number</ion-select-option>
-              <ion-select-option value="2">Enum</ion-select-option>
-              <ion-select-option value="3">Boolean</ion-select-option>
-            </ion-select>
-          </ion-item>
-          <ion-item>
-            <ion-label>Required</ion-label>
-            <ion-toggle
-              color="primary"
-              v-model="field.required"
-              slot="end"
-            ></ion-toggle>
-          </ion-item>
-          <ion-item v-if="field.type == 2">
-            <ion-label position="stacked">Values</ion-label>
-            <ion-textarea>
-              <ion-chip v-for="enumVal in field.enum" :key="enumVal">
-                <ion-label>{{ enumVal }}</ion-label>
-                <ion-icon :icon="close"></ion-icon>
-              </ion-chip>
-            </ion-textarea>
-          </ion-item>
-        </ion-list>
-      </ion-item>
-      <ion-item-divider></ion-item-divider>
     </ion-list>
     <ion-button expand="block" @click="$emit('save', c)">Add</ion-button>
   </ion-content>
+  <!---FIELDS--->
+  <FieldEditor
+    v-else-if="segment === 'fields'"
+    :scheme="c.ItemSchema"
+    @save="$emit('save', c)"
+  ></FieldEditor>
 </template>
 
 <script lang="ts">
@@ -115,11 +69,14 @@ import {
   IonToggle,
   IonFabButton,
   IonFab,
+  IonSegment,
+  IonSegmentButton,
 } from '@ionic/vue';
 
 import { Catalogue, FieldTypes } from '@/types';
 import { PropType } from '@vue/runtime-core';
 import { ref } from 'vue';
+import FieldEditor from '@/components/FieldEditor.vue';
 import {
   close,
   add,
@@ -140,15 +97,18 @@ export default {
     IonItem,
     IonLabel,
     IonButton,
-    IonSelect,
-    IonSelectOption,
-    IonChip,
-    IonTextarea,
-    IonIcon,
-    IonItemDivider,
-    IonToggle,
-    IonFabButton,
-    IonFab,
+    // IonSelect,
+    // IonSelectOption,
+    // IonChip,
+    // IonTextarea,
+    // IonIcon,
+    // IonItemDivider,
+    // IonToggle,
+    // IonFabButton,
+    // IonFab,
+    IonSegment,
+    IonSegmentButton,
+    FieldEditor,
   },
   emits: ['dismiss', 'save'],
   props: {
@@ -162,6 +122,10 @@ export default {
       props.catalogue.name === '' ? 'New Catalogue' : props.catalogue.name;
     const c = ref<Catalogue>(props.catalogue);
 
+    const enumTextarea = ref<string>('');
+
+    const segment = ref<string>('options');
+
     const clickedAddField = () => {
       c.value.ItemSchema.unshift({
         id: '0',
@@ -171,7 +135,45 @@ export default {
       });
     };
 
+    const removeEnumValue = (fieldName: string, val: string) => {
+      const fieldIndex = c.value.ItemSchema.findIndex((field) => {
+        return field.name === fieldName;
+      });
+
+      c.value.ItemSchema[fieldIndex].enum = c.value.ItemSchema[
+        fieldIndex
+      ].enum?.filter((enumValue) => {
+        return enumValue !== val;
+      });
+    };
+
+    const appendEnumValue = (fieldName: string) => {
+      const fieldIndex = c.value.ItemSchema.findIndex((field) => {
+        return field.name === fieldName;
+      });
+
+      if (!c.value.ItemSchema[fieldIndex].enum) {
+        c.value.ItemSchema[fieldIndex].enum = [];
+      }
+
+      c.value.ItemSchema[fieldIndex].enum?.push(enumTextarea.value);
+      enumTextarea.value = '';
+    };
+
+    const truncateEnumValue = (fieldName: string) => {
+      if (enumTextarea.value == '') {
+        const fieldIndex = c.value.ItemSchema.findIndex((field) => {
+          return field.name === fieldName;
+        });
+        c.value.ItemSchema[fieldIndex].enum?.splice(-1, 1);
+      }
+    };
+
     return {
+      enumTextarea,
+      truncateEnumValue,
+      removeEnumValue,
+      appendEnumValue,
       clickedAddField,
       ellipsisVertical,
       ellipsisHorizontal,
@@ -179,14 +181,8 @@ export default {
       close,
       c,
       title,
+      segment,
     };
   },
 };
 </script>
-<style scoped>
-ion-fab-button {
-  margin-left: 70px;
-  width: 23px;
-  height: 23px;
-}
-</style>
