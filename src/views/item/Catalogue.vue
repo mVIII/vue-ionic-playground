@@ -12,102 +12,117 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-toolbar style="padding-top: 10px" slot="fixed">
-        <div slot="end">
-          <ion-button slot="end" fill="solid">+ Ingredient</ion-button>
-          <ion-button slot="end" fill="solid">+ Category</ion-button>
-        </div>
-      </ion-toolbar>
       <ion-grid style="margin-top: 60px">
-        <ion-row>
-          <ion-col>
-            <ion-row class="ion-align-items-left">
-              <ion-col v-for="item in items" :key="item.name">
-                <apexchart
-                  height="200"
-                  :options="item.chartOptions"
-                  :series="item.series"
-                ></apexchart>
-              </ion-col>
-            </ion-row>
+        <ion-row class="ion-hide-md-down">
+          <ion-grid>
             <ion-row>
               <ion-col>
-                <ion-card><ion-card-header>Meat</ion-card-header></ion-card>
-              </ion-col>
-              <ion-col>
-                <ion-card color="primary"
-                  ><ion-card-header>Seafood</ion-card-header></ion-card
-                >
-              </ion-col>
-              <ion-col>
-                <ion-card><ion-card-header>Vegetables</ion-card-header></ion-card>
-              </ion-col>
-            </ion-row>
-            <ion-row>
-              <ion-col>
-                <ion-card color="secondary"
-                  ><ion-card-header>Fish</ion-card-header></ion-card
-                >
-              </ion-col>
-              <ion-col>
-                <ion-card><ion-card-header>Sharks</ion-card-header></ion-card>
-              </ion-col>
-              <ion-col>
-                <ion-card><ion-card-header>Clams</ion-card-header></ion-card>
-              </ion-col>
-            </ion-row>
-            <div>
-              <ion-chip
-                v-for="sortingOption in sortingOptions"
-                :key="sortingOption.name"
-                @click="toggleSortingOption(sortingOption)"
-              >
-                <ion-label>{{ sortingOption.name }}</ion-label>
-                <ion-icon
-                  v-if="sortingFilter.name === sortingOption.name"
-                  :icon="close"
-                ></ion-icon>
-              </ion-chip>
-            </div>
-
-            <ion-item-divider />
-            <ion-row>
-              <ion-grid>
-                <ion-col>
-                  <ion-row>
-                    <ion-card
-                      v-for="item in displayedItems"
-                      :key="item.name"
-                      :color="randomColor()"
+                <!---CHARTS--->
+                <ion-row>
+                  <ion-col v-for="item in items" :key="item.name">
+                    <apexchart
+                      height="200"
+                      :options="item.chartOptions"
+                      :series="item.series"
+                    ></apexchart>
+                  </ion-col>
+                </ion-row>
+                <!---CATEGORIES--->
+                <ion-row>
+                  <ion-col>
+                    <ion-card><ion-card-header>Meat</ion-card-header></ion-card>
+                  </ion-col>
+                  <ion-col>
+                    <ion-card color="primary"
+                      ><ion-card-header>Seafood</ion-card-header></ion-card
                     >
-                      <ion-card-content>
-                        <div
-                          style="display: flex; justify-content: space-evenly"
-                        >
-                          <ion-avatar slot="start">
-                            <img :src="item.image" />
-                          </ion-avatar>
-                        </div>
-                        <strong>{{ item.name }}</strong
-                        ><br />
-                        7 days left<br />
-                        10 bottles left<br />
-                        ~201.00€<br />
-                      </ion-card-content>
-                    </ion-card>
-                  </ion-row>
-                </ion-col>
-              </ion-grid>
+                  </ion-col>
+                  <ion-col>
+                    <ion-card
+                      ><ion-card-header>Vegetables</ion-card-header></ion-card
+                    >
+                  </ion-col>
+                </ion-row>
+                <!---SUBCATEGORIES--->
+                <ion-row>
+                  <ion-col>
+                    <ion-card
+                      ><ion-card-header>Sharks</ion-card-header></ion-card
+                    >
+                  </ion-col>
+                  <ion-col>
+                    <ion-card
+                      ><ion-card-header>Clams</ion-card-header></ion-card
+                    >
+                  </ion-col>
+                </ion-row>
+              </ion-col>
+              <!---NOTIFICATIONS--->
+              <ion-col size="2">
+                <ion-list-header>
+                  <ion-label>
+                    <ion-icon :icon="notifications" />
+                    Notifications
+                  </ion-label>
+                </ion-list-header>
+                <ion-content>
+                  <ion-list>
+                    <ion-item
+                      :color="notification.color"
+                      v-for="notification in liveNotifications"
+                      :key="notification.title"
+                      @click="hoverNotification(notification)"
+                    >
+                      <ion-avatar slot="start">
+                        <img :src="notification.icon" />
+                      </ion-avatar>
+                      <ion-label>
+                        <h2>{{ notification.title }}</h2>
+                        <p>{{ notification.description }}</p>
+                      </ion-label>
+                    </ion-item>
+                    <ion-popover
+                      :is-open="notificationPopOverOpen"
+                      css-class="my-custom-class"
+                      :translucent="true"
+                      @onDidDismiss="setNotificationPopOverOpen(false)"
+                    >
+                      <ion-card>
+                        <ion-card-content>
+                          <div
+                            style="display: flex; justify-content: space-evenly"
+                          >
+                            <ion-avatar slot="start">
+                              <img :src="hoveredNotification.icon" />
+                            </ion-avatar>
+                          </div>
+                          <strong>{{ hoveredNotification.title }}</strong>
+                          <br />
+                          <strong>{{ hoveredNotification.description }}</strong>
+                          <br />
+                        </ion-card-content>
+                      </ion-card>
+                    </ion-popover>
+                  </ion-list>
+                </ion-content>
+              </ion-col>
             </ion-row>
+          </ion-grid>
+        </ion-row>
+        <ion-item-divider style="margin-top:12px;" />
+        <!----ITEM DISPLAY--->
+        <ion-row v-if="!itemsLoading">
+          <ion-col>
+            <ItemGrid :displayItems="displayedItems" class="ion-hide-sm-down" />
+            <ItemList :displayItems="displayedItems" class="ion-hide-md-up" />
           </ion-col>
-          <ion-col size="2" style="margin-top: 400px" class="ion-hide-md-down">
+          <ion-col size="2" class="ion-hide-md-down">
             <ion-toolbar>
               <ion-searchbar
                 @ionInput="queryDisplayedItems($event.target.value)"
               ></ion-searchbar>
             </ion-toolbar>
             <ItemFilter
-              v-if="!catalogueLoading"
               @apply="applyFilter"
               :catalogue="selectedCatalogue"
               :itemFilter="itemFilter"
@@ -166,21 +181,21 @@
 </template>
 
 <script lang="ts">
-import { ApexOptions } from "apexcharts";
-import VueApexCharts from "vue3-apexcharts";
+import { ApexOptions } from 'apexcharts';
+import VueApexCharts from 'vue3-apexcharts';
+import ItemGrid from '@/components/ItemGrid.vue';
+import ItemList from '@/components/ItemList.vue';
 import {
+  IonPopover,
   IonItemDivider,
   IonPage,
-  IonList,
   IonSearchbar,
   IonContent,
   IonLabel,
-  IonItem,
   IonHeader,
   IonToolbar,
   IonButtons,
   IonTitle,
-  IonListHeader,
   IonCardContent,
   IonCardHeader,
   IonBackButton,
@@ -198,42 +213,48 @@ import {
   IonRow,
   IonCol,
   IonCard,
-} from "@ionic/vue";
+} from '@ionic/vue';
 
-import { useItem } from "@/composables/useItem";
-import { onMounted, onUpdated } from "@vue/runtime-core";
-import router from "@/router";
-import { useCatalogue } from "@/composables/useCatalogue";
-import { options, close } from "ionicons/icons";
-import ItemFilter from "./Filter.vue";
-import { ref } from "vue";
-import { Filter, SortingFilter, SortingType } from "@/services/dtos/";
-import ItemNewEdit from "./NewEdit.vue";
+import { useItem } from '@/composables/useItem';
+import { useNotifications } from '@/composables/useNotifications';
+import { onUpdated } from '@vue/runtime-core';
+import router from '@/router';
+import { useCatalogue } from '@/composables/useCatalogue';
+import { options, close, notifications } from 'ionicons/icons';
+import ItemFilter from './Filter.vue';
+import { ref } from 'vue';
+import {
+  Filter,
+  SortingFilter,
+  SortingType,
+  Notification,
+} from '@/services/dtos/';
+import ItemNewEdit from './NewEdit.vue';
 
 export default {
-  name: "Catalogue",
+  name: 'Catalogue',
   components: {
     apexchart: VueApexCharts,
+    IonPopover,
+    ItemList,
+    ItemGrid,
     IonItemDivider,
     IonButtons,
     IonTitle,
-    IonSearchbar,
-    IonLabel,
+    // IonSearchbar,
+    // IonLabel,
     IonHeader,
     IonToolbar,
-    // IonItem,
     IonCard,
     IonCardHeader,
-    IonCardContent,
-    // IonList,
+    //IonCardContent,
     IonContent,
     IonPage,
-    // IonListHeader,
     IonLoading,
     IonBackButton,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonAvatar,
+    //IonAvatar,
     IonFabButton,
     IonFab,
     ItemFilter,
@@ -241,11 +262,10 @@ export default {
     IonIcon,
     IonButton,
     ItemNewEdit,
-    IonChip,
+    //IonChip,
     IonGrid,
     IonRow,
     IonCol,
-    //IonPopover,
   },
   setup() {
     const {
@@ -268,17 +288,29 @@ export default {
       selectedCatalogue,
     } = useCatalogue();
 
+    const { liveNotifications, listenForNotifications } = useNotifications();
+
     onUpdated(async () => {
       try {
         const catalogueId = router.currentRoute.value.params.id as string;
-        console.log(catalogueId)
+        console.log(catalogueId);
         await runWrappedGetCatalogue(catalogueId);
         catalogueID.value = catalogueId;
         await runWrappedGetItemsByCatalogue();
+
+        listenForNotifications();
       } catch (error) {
         console.log(error);
       }
     });
+
+    const hoveredNotification = ref<Notification>({
+      title: '',
+      description: '',
+      icon: '',
+      color: '',
+    });
+
     const filterModalOpen = ref(false);
     const setFilterModalOpen = (state: boolean) =>
       (filterModalOpen.value = state);
@@ -286,6 +318,10 @@ export default {
     const addEditModalOpen = ref(false);
     const setAddEditModalOpen = (state: boolean) =>
       (addEditModalOpen.value = state);
+
+    const notificationPopOverOpen = ref(false);
+    const setNotificationPopOverOpen = (state: boolean) =>
+      (notificationPopOverOpen.value = state);
 
     const applyFilter = (newItemFilter: Filter) => {
       itemFilter.value = newItemFilter;
@@ -295,7 +331,7 @@ export default {
     const toggleSortingOption = (sortingOption: SortingFilter) => {
       if (sortingFilter.value.name === sortingOption.name) {
         sortingFilter.value = {
-          name: "",
+          name: '',
           type: SortingType.none,
         };
       } else {
@@ -305,32 +341,36 @@ export default {
 
     const sortingOptions: SortingFilter[] = [
       {
-        name: "Show newest first",
+        name: 'Show newest first',
         type: SortingType.sortNewstFirst,
       },
       {
-        name: "Sort oldest first",
+        name: 'Sort oldest first',
         type: SortingType.sortAlphabetically,
       },
       {
-        name: "Sort alphabetically",
+        name: 'Sort alphabetically',
         type: SortingType.sortAlphabetically,
       },
     ];
 
     const clickedAdd = () => {
       CRUDItem.value = {
-        id: "",
-        catalogue: "",
-        name: "",
+        id: '',
+        catalogue: '',
+        name: '',
         fields: [],
       };
       setAddEditModalOpen(true);
     };
 
+    const hoverNotification = (noti: Notification) => {
+      hoveredNotification.value = noti;
+      setNotificationPopOverOpen(true);
+    };
     const seriesRadar = [
       {
-        name: "Series 1",
+        name: 'Series 1',
         data: [80, 50, 30, 40, 100],
       },
     ];
@@ -343,16 +383,16 @@ export default {
       series: { name: string; data: number[] }[] | number[];
     }[] = [
       {
-        name: "Add new item",
+        name: 'Add new item',
         chartOptions: {
           chart: {
-            type: "radar",
+            type: 'radar',
           },
           title: {
-            text: "Client preferences",
+            text: 'Client preferences',
           },
           xaxis: {
-            categories: ["Fish", "Meat", "Salad", "Fruit", "Wine"],
+            categories: ['Fish', 'Meat', 'Salad', 'Fruit', 'Wine'],
           },
           markers: {
             size: 6,
@@ -361,45 +401,45 @@ export default {
         series: seriesRadar,
       },
       {
-        name: "Pie chart",
+        name: 'Pie chart',
         chartOptions: {
           title: {
-            text: "Stock",
+            text: 'Stock',
           },
           chart: {
-            type: "pie",
+            type: 'pie',
           },
-          labels: ["Meat", "Fish", "Salad", "Fruit", "Wine"],
+          labels: ['Meat', 'Fish', 'Salad', 'Fruit', 'Wine'],
         },
         series: seriesPie,
       },
       {
-        name: "Line chart",
+        name: 'Line chart',
         chartOptions: {
           title: {
-            text: "Sales",
+            text: 'Sales',
           },
           chart: {
-            type: "line",
+            type: 'line',
             zoom: {
               enabled: false,
             },
           },
           grid: {
             row: {
-              colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+              colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
               opacity: 0.5,
             },
           },
         },
         series: [
-          { name: "series 2", data: [10, 41, 35, 51, 49, 62, 69, 91, 148] },
+          { name: 'series 2', data: [10, 41, 35, 51, 49, 62, 69, 91, 148] },
         ],
       },
     ];
 
     function randomColor() {
-      const colors = ["warning", "danger", "light"];
+      const colors = ['warning', 'danger', 'light'];
       return colors[Math.floor(Math.random() * colors.length)];
     }
 
@@ -427,6 +467,12 @@ export default {
       sortingOptions,
       sortingFilter,
       toggleSortingOption,
+      notifications,
+      liveNotifications,
+      notificationPopOverOpen,
+      setNotificationPopOverOpen,
+      hoveredNotification,
+      hoverNotification,
     };
   },
 };
