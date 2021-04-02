@@ -50,7 +50,6 @@ export default defineComponent({
   },
   setup(props: any) {
     const items = ref<Item[]>(props.displayItems);
-    console.log(items.value);
     return { items };
   },
 });
