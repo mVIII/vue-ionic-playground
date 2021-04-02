@@ -31,6 +31,9 @@ import MockAuthenticationService from '@/services/mock/Authentication';
 import MockCatalogueService from '@/services/mock/Catalogue';
 import MockItemService from './services/mock/Item';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import MockNotificationService from './services/mock/Notification';
+
+const mockNoti = new MockNotificationService();
 
 container.register('Authentication', {
   useClass: MockAuthenticationService,
@@ -42,6 +45,10 @@ container.register('Catalogue', {
 
 container.register('Item', {
   useClass: MockItemService,
+});
+
+container.register('Notification', {
+  useValue: mockNoti,
 });
 
 const plugins = [];
@@ -60,4 +67,5 @@ router.isReady().then(() => {
   app.mount('#app');
 
   defineCustomElements(window);
+  mockNoti.spam();
 });
