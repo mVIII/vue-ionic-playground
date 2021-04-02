@@ -112,7 +112,6 @@ export default {
     props: any,
     context: SetupContext<('dismiss' | 'save')[]>
   ): Record<string, unknown> {
-    console.log(props.item.name);
     const title =
       props.item.name === '' ? 'New ' + props.catalogue.name : props.item.name;
 
